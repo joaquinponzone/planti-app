@@ -6,6 +6,7 @@ import { PlantProvider } from "@/components/plant-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ThemeToggle } from "@/components/theme-toggle"
 import DataActions from "@/components/data-actions"
+import { Footer } from "@/components/footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -32,6 +33,7 @@ export default function RootLayout({
                 </div>
               </header>
               {children}
+              <Footer />
             </div>
           </PlantProvider>
         </ThemeProvider>
