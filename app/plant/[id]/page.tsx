@@ -198,7 +198,7 @@ export default function PlantDetail() {
                       key={activity.type}
                       onClick={() => handleAddActivity(activity.type as CareActivity["type"])}
                       variant="outline"
-                      className="h-12 md:h-8 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                      className="text-black h-12 md:h-8 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
                     >
                       {activity.icon}
                       <span className="ml-2">{activity.label}</span>
@@ -209,10 +209,10 @@ export default function PlantDetail() {
             </Collapsible>
 
             <div className="border-4 border-black bg-card/20 neo-brutalist-shadow">
-              <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-card dark:text-neutral-900">Activity log</h2>
+              <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-secondary dark:text-neutral-900">Activity log</h2>
 
               {plant.careLog.length === 0 ? (
-                <div className="p-6 text-center text-muted-foreground">No activities recorded yet</div>
+                <div className="p-6 text-center text-muted-foreground"> - No activities recorded yet - </div>
               ) : (
                 <div className="divide-y-2 divide-black">
                   {plant.careLog.map((activity) => {
