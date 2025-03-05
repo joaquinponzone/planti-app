@@ -8,11 +8,21 @@ export default function Home() {
       <div className="max-w-4xl mx-auto">
         <header className="mb-8">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight border-b-4 border-black dark:border-primary pb-2 mb-2">Planti</h1>
-          <p className="text-lg font-medium text-muted-foreground">Keep your green friends alive!</p>
+          {/* <p className="text-lg font-medium text-muted-foreground">Keep your green friends alive!</p> */}
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-lg font-medium text-muted-foreground">Keep your green friends alive!</p>
+            <Link
+              href="/add-plant"
+              className="flex items-center gap-2 bg-primary/30 dark:bg-primary dark:hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 border-2 border-black neo-brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+            >
+              <PlusCircle size={20} />
+              <span>New plant</span>
+            </Link>
+          </div>
         </header>
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">My plants</h2>
+        {/* <div className="flex justify-between items-center mb-6">
+          <span className="text-2xl font-bold">My plants</span>
           <Link
             href="/add-plant"
             className="flex items-center gap-2 bg-primary/30 dark:bg-primary dark:hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 border-2 border-black neo-brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
@@ -20,7 +30,7 @@ export default function Home() {
             <PlusCircle size={20} />
             <span>New plant</span>
           </Link>
-        </div>
+        </div> */}
 
         <PlantList />
       </div>

@@ -20,12 +20,12 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import { ChevronDown } from "lucide-react"
+// import {
+//   Collapsible,
+//   CollapsibleContent,
+//   CollapsibleTrigger,
+// } from "@/components/ui/collapsible"
+// import { ChevronDown } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+// import { RepottingDialog } from "@/components/care/repotting-dialog"
+import { CareActivityDialog } from "@/components/care/care-activity-dialog"
 
 export default function PlantDetail() {
   const params = useParams()
@@ -129,6 +131,8 @@ export default function PlantDetail() {
     }
   }
 
+  const activitiesWithDialogs = ["repotted", "fertilized", "medicated", "moved"]
+
   return (
     <main className="container mx-auto p-4 md:p-8 pt-0">
       <div className="max-w-2xl mx-auto">
@@ -181,11 +185,11 @@ export default function PlantDetail() {
           </TabsList>
 
           <TabsContent value="logs" className="mt-4">
-            <Collapsible className="mb-4">
+            {/* <Collapsible className="mb-4">
               <CollapsibleTrigger asChild>
                 <Button
                   variant="outline"
-                  className="h-16 text-neutral-900 dark:text-neutral-200 w-full border-2 border-black justify-between hover:bg-primary/30 bg-neutral-100 dark:bg-card/10 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                  className="h-16 text-neutral-900 dark:text-white w-full border-2 border-black justify-between hover:bg-primary/30 bg-card/10 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
                 >
                   <span className="text-xl font-bold">Add activity</span>
                   <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
@@ -206,7 +210,107 @@ export default function PlantDetail() {
                   ))}
                 </div>
               </CollapsibleContent>
-            </Collapsible>
+            </Collapsible> */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pb-4">
+              {/* {careActivities.map((activity) => activity.type === "repotted" ? (
+                <RepottingDialog key={activity.type} plantId={plant.id} />
+              ):(
+                <Button
+                  key={activity.type}
+                  onClick={() => handleAddActivity(activity.type as CareActivity["type"])}
+                  variant="outline"
+                  className="text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                >
+                  {activity.icon}
+                  <span className="ml-2">{activity.label}</span>
+                </Button>
+              ))} */}
+              {careActivities.filter(activity => !activitiesWithDialogs.includes(activity.type)).map((activity) => (
+                <Button
+                  key={activity.type}
+                  onClick={() => handleAddActivity(activity.type as CareActivity["type"])}
+                  variant="outline"
+                  className="text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                >
+                  {activity.icon}
+                  <span className="ml-2">{activity.label}</span>
+                </Button>
+              ))}
+              {activitiesWithDialogs.map((activity) => (
+                <CareActivityDialog 
+                  key={activity}
+                  plantId={plant.id}
+                  activityType={activity}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="w-full text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                    >
+                      {careActivities.find((a) => a.type === activity)?.icon}
+                      <span className="ml-2">{careActivities.find((a) => a.type === activity)?.label}</span>
+                    </Button>
+                  }
+                />
+              ))}
+
+              {/* <div className="flex gap-2">
+                <CareActivityDialog 
+                  plantId={plant.id}
+                  activityType="repotted"
+                  trigger={        
+                    <Button
+                      variant="outline"
+                      className="text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                    >
+                      {careActivities.find((a) => a.type === "repotted")?.icon}
+                      <span className="ml-2">Repotting</span>
+                    </Button>
+                  }
+                />
+    
+                <CareActivityDialog 
+                  plantId={plant.id}
+                  activityType="fertilized"
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                    >
+                      {careActivities.find((a) => a.type === "fertilized")?.icon}
+                      <span className="ml-2">Fertilized</span>
+                    </Button>
+                  }
+                />
+                
+                <CareActivityDialog 
+                  plantId={plant.id}
+                  activityType="medicated"
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                    >
+                      {careActivities.find((a) => a.type === "medicated")?.icon}
+                      <span className="ml-2">Treated</span>
+                    </Button>
+                  }
+                />
+                
+                <CareActivityDialog 
+                  plantId={plant.id}
+                  activityType="moved"
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                    >
+                      {careActivities.find((a) => a.type === "moved")?.icon}
+                      <span className="ml-2">Moved</span>
+                    </Button>
+                  }
+                />
+              </div> */}
+            </div>
 
             <div className="border-4 border-black bg-card/20 neo-brutalist-shadow">
               <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-secondary dark:text-neutral-900">Activity log</h2>
@@ -227,6 +331,12 @@ export default function PlantDetail() {
                             <p className="text-sm text-muted-foreground">{formatDate(activity.date)}</p>
                           </div>
                         </div>
+                        {activitiesWithDialogs.includes(activity.type) && (
+                          <div className="ml-3">
+                            <p className="text-sm font-semibold">Notes:</p>
+                            <p className="text-sm text-muted-foreground">{activity.notes}</p>
+                          </div>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"

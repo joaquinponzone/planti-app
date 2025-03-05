@@ -29,6 +29,7 @@ export type Plant = {
   schedules: Schedule[]
   careLog: CareActivity[]
   archived: boolean
+  lastWatered?: string
 }
 
 type PlantContextType = {

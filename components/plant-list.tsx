@@ -74,97 +74,112 @@ export default function PlantList() {
     )
   }
 
-  return (
-    <div className="grid grid-cols-1 gap-4">
-      {activePlants.map((plant) => {
-        const requiresCare = needsCare(plant)
+  // Group plants by location
+  const groupedPlants = activePlants.reduce<Record<string, typeof activePlants>>((acc, plant) => {
+    const key = plant.location || 'Unassigned';
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(plant);
+    return acc;
+  }, {});
 
-        return (
-          <div
-            key={plant.id}
-            className={`border-4 ${
-              requiresCare ? "border-destructive" : "border-black"
-            } bg-card dark:bg-primary/10 text-card-foreground overflow-hidden neo-brutalist-shadow`}
-          >
-            <div className="flex items-center p-4">
-              {/* <div
-                className={`w-16 h-16 flex items-center justify-center text-primary-foreground text-3xl font-bold mr-4 ${requiresCare ? "bg-destructive" : "bg-primary"}`}
-              >
-                {getInitial(plant.name)}
-              </div> */}
-
-              <div className="flex-grow">
-                <span className="flex gap-2 items-center">
-                  <h3 className="text-xl font-bold">{plant.name}</h3>
-                  {plant.location && <p className="text-sm text-muted-foreground dark:text-primary"> - {plant.location}</p>}
-                </span>
-                <hr className="my-2 w-3/4 border-2 border-black" />
-                <div className="flex flex-col gap-1">
-                  {plant.lastWatered && (
-                    <p className="text-sm">
-                      Last watered: <span className="text-black dark:text-white font-bold font-mono">{new Date(plant.lastWatered).toLocaleDateString()}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => addCareActivity(plant.id, { type: "watered" })}
-                  className="bg-blue-500 hover:bg-blue-600 text-white border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                  size="icon"
-                >
-                  <Droplet className="h-5 w-5" />
-                  <span className="sr-only">Water</span>
-                </Button>
-
-                <Link href={`/plant/${plant.id}`}>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                  >
-                    <NotebookText className="h-5 w-5" />
-                    <span className="sr-only">NotebookText</span>
-                  </Button>
-                </Link>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
-                    >
-                      <MoreVertical className="h-5 w-5" />
-                      <span className="sr-only">More</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-background border-2 border-black">
-                    <DropdownMenuItem className="cursor-pointer hover:bg-primary hover:text-primary-foreground">
-                      <Pencil className="h-4 w-4 mr-2" />
-                      <Link href={`/plant/${plant.id}/edit`} className="flex w-full">
-                        Edit plant
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="cursor-pointer text-destructive hover:text-destructive-foreground hover:bg-destructive"
-                      onSelect={() => setPlantToDelete(plant.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+  // Plant card component
+  const PlantCard = ({ plant }: { plant: (typeof activePlants)[0] }) => {
+    const requiresCare = needsCare(plant as Plant);
+    
+    return (
+      <div
+        key={plant.id}
+        className={`border-4 ${
+          requiresCare ? "border-destructive" : "border-black"
+        } bg-card dark:bg-primary/10 text-card-foreground overflow-hidden neo-brutalist-shadow`}
+      >
+        <div className="flex items-center p-4">
+          <div className="flex-grow">
+            <span className="flex gap-2 items-center">
+              <h3 className="text-xl font-bold">{plant.name}</h3>
+            </span>
+            <hr className="my-2 w-3/4 border-2 border-black" />
+            <div className="flex flex-col gap-1">
+              {plant.lastWatered && (
+                <p className="text-sm">
+                  Last watered: <span className="text-black dark:text-white font-bold font-mono">{new Date(plant.lastWatered).toLocaleDateString()}</span>
+                </p>
+              )}
             </div>
-
-            {requiresCare && (
-              <div className="bg-destructive/20 p-3 text-sm font-medium border-t-2 border-destructive">Care needed</div>
-            )}
           </div>
-        )
-      })}
+
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => addCareActivity(plant.id, { type: "watered" })}
+              className="bg-blue-500 hover:bg-blue-600 text-white border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+              size="icon"
+            >
+              <Droplet className="h-5 w-5" />
+              <span className="sr-only">Water</span>
+            </Button>
+
+            <Link href={`/plant/${plant.id}`}>
+              <Button
+                variant="outline"
+                size="icon"
+                className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+              >
+                <NotebookText className="h-5 w-5" />
+                <span className="sr-only">NotebookText</span>
+              </Button>
+            </Link>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+                >
+                  <MoreVertical className="h-5 w-5" />
+                  <span className="sr-only">More</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background border-2 border-black">
+                <DropdownMenuItem className="cursor-pointer hover:bg-primary hover:text-primary-foreground">
+                  <Pencil className="h-4 w-4 mr-2" />
+                  <Link href={`/plant/${plant.id}/edit`} className="flex w-full">
+                    Edit plant
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="cursor-pointer text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                  onSelect={() => setPlantToDelete(plant.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {requiresCare && (
+          <div className="bg-destructive/20 p-3 text-sm font-medium border-t-2 border-destructive">Care needed</div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {Object.entries(groupedPlants).map(([location, plantsInLocation]) => (
+        <div key={location} className="space-y-3">
+          <h2 className="text-lg font-semibold capitalize border-b-4 border-black w-fit">{location}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {plantsInLocation.map((plant) => (
+              <PlantCard key={plant.id} plant={plant} />
+            ))}
+          </div>
+        </div>
+      ))}
 
       <AlertDialog open={!!plantToDelete} onOpenChange={() => setPlantToDelete(null)}>
         <AlertDialogContent className="border-2 border-black neo-brutalist-shadow">
@@ -193,4 +208,3 @@ export default function PlantList() {
     </div>
   )
 }
-
