@@ -5,6 +5,7 @@ import "./globals.css"
 import { PlantProvider } from "@/components/plant-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { ThemeToggle } from "@/components/theme-toggle"
+import DataActions from "@/components/data-actions"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,7 +26,8 @@ export default function RootLayout({
           <PlantProvider>
             <div className="min-h-screen bg-background text-foreground">
               <header className="container mx-auto p-4 pb-0 bg-background">
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                  <DataActions />
                   <ThemeToggle />
                 </div>
               </header>
