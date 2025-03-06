@@ -11,8 +11,8 @@ import { Footer } from "@/components/footer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Planti - Plant Care Tracking App",
-  description: "Track watering and care schedules for your indoor plants",
+  title: "Planti - Keep your green friends alive!",
+  description: "Planti is a simple app to help you take care of your plants. It's a place to store information about your plants, their care, and their growth.",
 }
 
 export default function RootLayout({

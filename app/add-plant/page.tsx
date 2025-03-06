@@ -47,7 +47,7 @@ export default function AddPlant() {
           Back to plants
         </Link>
 
-        <div className="border-4 border-black dark:border-white bg-white dark:bg-black p-6 md:p-8 neo-brutalist-shadow">
+        <div className="border-4 border-black bg-white dark:bg-neutral-800 p-6 md:p-8 neo-brutalist-shadow">
           <h1 className="text-3xl font-bold mb-6 border-b-4 border-black pb-2">New plant</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -61,7 +61,7 @@ export default function AddPlant() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="border-2 border-black dark:border-white bg-background h-12 text-lg"
+                className="border-2 border-black bg-card/30 dark:bg-card/20 h-12 px-4 neo-brutalist-shadow focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-black"
                 placeholder="Kitchen window plant"
               />
               <p className="text-sm text-muted-foreground">
@@ -78,7 +78,7 @@ export default function AddPlant() {
                 name="scientificName"
                 value={formData.scientificName}
                 onChange={handleChange}
-                className="border-2 border-black dark:border-white bg-background h-12 text-lg"
+                className="border-2 border-black bg-card/30 dark:bg-card/20 h-12 px-4 neo-brutalist-shadow focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-black"
                 placeholder="Scientific name"
               />
             </div>
@@ -92,7 +92,7 @@ export default function AddPlant() {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="border-2 border-black dark:border-white bg-background h-12 text-lg"
+                className="border-2 border-black bg-card/30 dark:bg-card/20 h-12 px-4 neo-brutalist-shadow focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-black"
                 placeholder="No location"
               />
               <p className="text-sm text-muted-foreground">To group plants by location</p>
@@ -100,14 +100,14 @@ export default function AddPlant() {
 
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-lg">
-                Note
+                Notes
               </Label>
               <Textarea
                 id="notes"
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
-                className="border-2 border-black dark:border-white bg-background min-h-[100px] text-lg"
+                className="border-2 border-black bg-card/30 dark:bg-card/20 h-12 px-4 neo-brutalist-shadow focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-black min-h-[100px] text-lg"
                 placeholder=""
               />
             </div>
