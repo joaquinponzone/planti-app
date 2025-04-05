@@ -1,7 +1,7 @@
 "use client"
 
-import { usePlants, type Plant } from "./plant-provider"
-import { Droplet, MoreVertical, NotebookText, Trash2, Pencil } from "lucide-react"
+import { usePlants, type Plant, type PlantStatusThresholds } from "./plant-provider"
+import { Droplet, MoreVertical, NotebookText, Trash2, Pencil, ChevronsUpDown, CheckCheck, AlarmClockCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -17,45 +17,54 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { Badge } from "./ui/badge"
 
-// Create a reusable RelativeTimeFormat instance (outside the component for performance if locale is fixed)
-// Or inside if the locale needs to be dynamic based on user settings/browser
+// Create a reusable RelativeTimeFormat instance
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
+// Extend Plant type locally to include calculated daysSinceLastWatered
+interface PlantWithWateringStatus extends Plant {
+  lastWateredDate: string | null;
+  daysSinceLastWatered: number | null;
+}
 
 export default function PlantList() {
   const { plants, addCareActivity, deletePlant, plantStatusThresholds } = usePlants()
   const [plantToDelete, setPlantToDelete] = useState<string | null>(null)
 
-  const activePlants = plants.filter((plant) => !plant.archived)
-    .map(plant => ({
-      ...plant,
-      lastWatered: plant.careLog
-        .filter(log => log.type === "watered")
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]?.date || null
-    }))
-    .sort((a, b) => {
-      // Plants without watering history go first
-      if (!a.lastWatered && !b.lastWatered) return 0
-      if (!a.lastWatered) return -1
-      if (!b.lastWatered) return 1
-      // Sort by oldest watering date first
-      return new Date(a.lastWatered).getTime() - new Date(b.lastWatered).getTime()
-    })
+  const activePlants: PlantWithWateringStatus[] = plants
+    .filter((plant) => !plant.archived)
+    .map((plant) => {
+      const lastWateredLog = plant.careLog
+        .filter((log) => log.type === "watered")
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      
+      const lastWateredDate = lastWateredLog?.date || null;
+      const daysSinceLastWatered = lastWateredDate
+        ? Math.floor((new Date().getTime() - new Date(lastWateredDate).getTime()) / (1000 * 60 * 60 * 24))
+        : null;
 
-  // Check if plant needs care
-  /**
-   * Determines if a plant needs care based on its care schedules.
-   * 
-   * This function checks if any of the plant's enabled care schedules
-   * have a nextDue date that has passed (is less than or equal to the current date).
-   * If the plant has no schedules, it's considered not needing care.
-   * 
-   * @param plant - The plant to check
-   * @returns true if the plant needs care, false otherwise
-   */
+      return {
+        ...plant,
+        lastWateredDate,
+        daysSinceLastWatered,
+      };
+    })
+    .sort((a, b) => {
+      if (!a.lastWateredDate && !b.lastWateredDate) return 0;
+      if (!a.lastWateredDate) return -1;
+      if (!b.lastWateredDate) return 1;
+      return new Date(a.lastWateredDate).getTime() - new Date(b.lastWateredDate).getTime();
+    });
+
+  // Check if plant needs care based on schedules (unchanged)
   const needsCare = (plant: Plant): boolean => {
     if (plant.schedules.length === 0) return false
-
     const now = new Date()
     return plant.schedules.some((schedule) => {
       if (!schedule.enabled) return false
@@ -63,6 +72,14 @@ export default function PlantList() {
       return nextDue <= now
     })
   }
+
+  // Check plant watering status (for coloring/collapsible logic)
+  const getWateringStatus = (days: number | null, thresholds: PlantStatusThresholds): 'green' | 'warning' | 'danger' => {
+    if (days === null) return 'green'; // Treat never watered as green for this logic
+    if (days >= thresholds.dangerDays) return 'danger';
+    if (days >= thresholds.warningDays) return 'warning';
+    return 'green';
+  };
 
   if (activePlants.length === 0) {
     return (
@@ -80,7 +97,7 @@ export default function PlantList() {
   }
 
   // Group plants by location
-  const groupedPlants = activePlants.reduce<Record<string, typeof activePlants>>((acc, plant) => {
+  const groupedPlants = activePlants.reduce<Record<string, PlantWithWateringStatus[]>>((acc, plant) => {
     const key = plant.location || 'Unassigned';
     if (!acc[key]) {
       acc[key] = [];
@@ -89,21 +106,16 @@ export default function PlantList() {
     return acc;
   }, {});
 
-  // Plant card component
-  const PlantCard = ({ plant }: { plant: (typeof activePlants)[0] }) => {
+  // Plant card component (now receives PlantWithWateringStatus)
+  const PlantCard = ({ plant }: { plant: PlantWithWateringStatus }) => {
     const requiresCare = needsCare(plant as Plant);
-    
-    const daysSinceLastWatered = plant.lastWatered
-      ? Math.floor((new Date().getTime() - new Date(plant.lastWatered).getTime()) / (1000 * 60 * 60 * 24))
-      : null;
+    const wateringStatus = getWateringStatus(plant.daysSinceLastWatered, plantStatusThresholds);
 
     const backgroundColorClass = cn(
-      "bg-card dark:bg-primary/10",
+      "bg-card dark:bg-primary/20",
       {
-        "bg-yellow-200/50 dark:bg-yellow-900/30":
-          daysSinceLastWatered !== null && daysSinceLastWatered >= plantStatusThresholds.warningDays && daysSinceLastWatered < plantStatusThresholds.dangerDays,
-        "bg-red-200/50 dark:bg-red-900/30":
-          daysSinceLastWatered !== null && daysSinceLastWatered >= plantStatusThresholds.dangerDays,
+        "bg-yellow-200/50 dark:bg-yellow-900/50": wateringStatus === 'warning',
+        "bg-red-200/50 dark:bg-red-900/50": wateringStatus === 'danger',
       },
     );
 
@@ -111,9 +123,7 @@ export default function PlantList() {
       <div
         key={plant.id}
         className={cn(
-          `border-4 ${
-            requiresCare ? "border-destructive" : "border-black"
-          } text-card-foreground overflow-hidden neo-brutalist-shadow`,
+          `border-4 ${requiresCare ? "border-destructive" : "border-black"} text-card-foreground overflow-hidden neo-brutalist-shadow`,
           backgroundColorClass
         )}
       >
@@ -124,14 +134,14 @@ export default function PlantList() {
             </span>
             <hr className="my-2 w-3/4 border-2 border-black" />
             <div className="flex flex-col gap-1">
-              {plant.lastWatered && (
+              {plant.lastWateredDate && (
                 <p className="text-sm">
                   Last watered: <span className="text-black dark:text-white font-bold font-mono">
-                    {daysSinceLastWatered === null
-                      ? 'Never' // Handle case where it was never watered
-                      : daysSinceLastWatered === 0
-                      ? 'Today' // Explicitly use 'Today'
-                      : rtf.format(-daysSinceLastWatered, 'day')}
+                    {plant.daysSinceLastWatered === null
+                      ? 'Never'
+                      : plant.daysSinceLastWatered === 0
+                      ? 'Today'
+                      : rtf.format(-plant.daysSinceLastWatered, 'day')}
                   </span>
                 </p>
               )}
@@ -144,12 +154,8 @@ export default function PlantList() {
               className={cn(
                 "bg-blue-500 hover:bg-blue-600 text-white border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all",
                 {
-                  "animate-pulse":
-                    daysSinceLastWatered !== null &&
-                    daysSinceLastWatered >= plantStatusThresholds.warningDays &&
-                    daysSinceLastWatered < plantStatusThresholds.dangerDays,
-                  "animate-bounce":
-                    daysSinceLastWatered !== null && daysSinceLastWatered >= plantStatusThresholds.dangerDays,
+                  "animate-pulse": wateringStatus === 'warning',
+                  "animate-bounce": wateringStatus === 'danger',
                 },
               )}
               size="icon"
@@ -165,7 +171,7 @@ export default function PlantList() {
                 className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
               >
                 <NotebookText className="h-5 w-5" />
-                <span className="sr-only">NotebookText</span>
+                <span className="sr-only">Details</span>
               </Button>
             </Link>
 
@@ -187,7 +193,7 @@ export default function PlantList() {
                     Edit plant
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="cursor-pointer text-destructive hover:text-destructive-foreground hover:bg-destructive"
                   onSelect={() => setPlantToDelete(plant.id)}
                 >
@@ -208,16 +214,73 @@ export default function PlantList() {
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedPlants).map(([location, plantsInLocation]) => (
-        <div key={location} className="space-y-3">
-          <h2 className="text-lg font-semibold capitalize border-b-4 border-black w-fit">{location}</h2>
+      {Object.entries(groupedPlants).map(([location, plantsInLocation]) => {
+        // Check if ALL plants in this location are green
+        const allPlantsGreen = plantsInLocation.every(
+          (plant) => getWateringStatus(plant.daysSinceLastWatered, plantStatusThresholds) === 'green'
+        );
+
+        const plantsInDanger = plantsInLocation.filter(
+          (plant) => getWateringStatus(plant.daysSinceLastWatered, plantStatusThresholds) === 'danger'
+        );
+
+        const plantsInWarning = plantsInLocation.filter(
+          (plant) => getWateringStatus(plant.daysSinceLastWatered, plantStatusThresholds) === 'warning'
+        );
+
+        const plantGrid = (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {plantsInLocation.map((plant) => (
               <PlantCard key={plant.id} plant={plant} />
             ))}
           </div>
-        </div>
-      ))}
+        );
+
+        return (
+          <div key={location} className="space-y-3">
+            {allPlantsGreen ? (
+              <Collapsible defaultOpen={true}>
+                <CollapsibleTrigger asChild>
+                  <div className="flex items-center w-full justify-between gap-1 text-lg font-semibold capitalize border-b-4 border-black hover:text-muted-foreground dark:hover:text-accent transition-colors">
+                  <button className="flex items-center gap-1 text-lg font-semibold capitalize hover:text-muted-foreground dark:hover:text-accent transition-colors">
+                    {location}
+                    <span className="flex items-center gap-2">
+                      <CheckCheck className="size-5 text-secondary" />
+                    </span>
+                  </button>
+                  <span className="flex items-center gap-2 rounded px-2 py-1">
+                    <ChevronsUpDown className="size-4" />
+                  </span>
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3">
+                 {plantGrid}
+                </CollapsibleContent>
+              </Collapsible>
+            ) : (
+              <>
+                <h2 className="flex items-center gap-2 text-lg font-semibold capitalize border-b-4 border-black w-fit">
+                  {location}
+                  <span className="flex items-center gap-2">
+                    <AlarmClockCheck className="size-5" />
+                    {plantsInDanger.length > 0 ? <Badge variant="outline" className={cn("bg-secondary text-white", {
+                      "bg-red-500": plantsInDanger.length > 1
+                    })}>
+                      {plantsInDanger.length}
+                    </Badge> : null}
+                    {plantsInWarning.length > 0 ? <Badge variant="outline" className={cn("bg-secondary text-white", {
+                      "bg-yellow-500": plantsInWarning.length > 1
+                    })}>
+                      {plantsInWarning.length}
+                    </Badge> : null}
+                  </span>
+                </h2>
+                {plantGrid}
+              </>
+            )}
+          </div>
+        );
+      })}
 
       <AlertDialog open={!!plantToDelete} onOpenChange={() => setPlantToDelete(null)}>
         <AlertDialogContent className="border-2 border-black neo-brutalist-shadow">
