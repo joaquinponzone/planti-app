@@ -241,13 +241,13 @@ export default function PlantList() {
             {allPlantsGreen ? (
               <Collapsible defaultOpen={true}>
                 <CollapsibleTrigger asChild>
-                    <button className="flex items-center gap-2 text-lg font-semibold capitalize hover:text-muted-foreground dark:hover:text-accent transition-colors border-b-4 border-black pb-1">
-                      {location}
+                    <button className="flex items-center gap-2 text-lg font-semibold capitalize hover:text-muted-foreground dark:hover:text-accent transition-colors border-b-4 border-black pb-1 w-full justify-between">
                       <span className="flex items-center gap-2">
+                        {location}
                         <ListChecks className="size-5 text-black p-0" />
-                        <Badge className="size-6 p-0.5 border-2 border-black">
-                          <ChevronsUpDown className="size-5 text-black p-0" />
-                        </Badge>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <ChevronsUpDown className="size-5 text-black p-0" />
                       </span>
                     </button>
 
@@ -262,10 +262,10 @@ export default function PlantList() {
                   {location}
                   <span className="flex items-center gap-2">
                     <AlarmClockCheck className="size-5" />
-                    {plantsInDanger.length > 0 ? <Badge variant="destructive">
+                    {plantsInDanger.length > 0 ? <Badge variant="destructive" className="border-2 border-black">
                       {plantsInDanger.length}
                     </Badge> : null}
-                    {plantsInWarning.length > 0 ? <Badge className="bg-yellow-500">
+                    {plantsInWarning.length > 0 ? <Badge className="bg-yellow-200/50 hover:bg-yellow-200/70 border-2 border-black">
                       {plantsInWarning.length}
                     </Badge> : null}
                   </span>
