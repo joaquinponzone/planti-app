@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { Analytics } from "@vercel/analytics/next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { PlantProvider } from "@/components/plant-provider"
@@ -35,6 +36,7 @@ export default function RootLayout({
                 </div>
               </header>
               {children}
+              <Analytics />
               <Footer />
             </div>
           </PlantProvider>
