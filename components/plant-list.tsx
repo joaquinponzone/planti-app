@@ -18,6 +18,10 @@ import {
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
+// Create a reusable RelativeTimeFormat instance (outside the component for performance if locale is fixed)
+// Or inside if the locale needs to be dynamic based on user settings/browser
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
 export default function PlantList() {
   const { plants, addCareActivity, deletePlant, plantStatusThresholds } = usePlants()
   const [plantToDelete, setPlantToDelete] = useState<string | null>(null)
@@ -122,7 +126,13 @@ export default function PlantList() {
             <div className="flex flex-col gap-1">
               {plant.lastWatered && (
                 <p className="text-sm">
-                  Last watered: <span className="text-black dark:text-white font-bold font-mono">{new Date(plant.lastWatered).toLocaleDateString()}</span>
+                  Last watered: <span className="text-black dark:text-white font-bold font-mono">
+                    {daysSinceLastWatered === null
+                      ? 'Never' // Handle case where it was never watered
+                      : daysSinceLastWatered === 0
+                      ? 'Today' // Explicitly use 'Today'
+                      : rtf.format(-daysSinceLastWatered, 'day')}
+                  </span>
                 </p>
               )}
             </div>

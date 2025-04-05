@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light">
           <PlantProvider>
             <div className="min-h-screen bg-background text-foreground">
               <header className="container mx-auto p-4 pb-0 bg-background">
