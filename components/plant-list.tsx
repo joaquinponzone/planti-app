@@ -16,9 +16,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useState } from "react"
+import { cn } from "@/lib/utils"
 
 export default function PlantList() {
-  const { plants, addCareActivity, deletePlant } = usePlants()
+  const { plants, addCareActivity, deletePlant, plantStatusThresholds } = usePlants()
   const [plantToDelete, setPlantToDelete] = useState<string | null>(null)
 
   const activePlants = plants.filter((plant) => !plant.archived)
@@ -88,12 +89,29 @@ export default function PlantList() {
   const PlantCard = ({ plant }: { plant: (typeof activePlants)[0] }) => {
     const requiresCare = needsCare(plant as Plant);
     
+    const daysSinceLastWatered = plant.lastWatered
+      ? Math.floor((new Date().getTime() - new Date(plant.lastWatered).getTime()) / (1000 * 60 * 60 * 24))
+      : null;
+
+    const backgroundColorClass = cn(
+      "bg-card dark:bg-primary/10",
+      {
+        "bg-yellow-200/50 dark:bg-yellow-900/30":
+          daysSinceLastWatered !== null && daysSinceLastWatered >= plantStatusThresholds.warningDays && daysSinceLastWatered < plantStatusThresholds.dangerDays,
+        "bg-red-200/50 dark:bg-red-900/30":
+          daysSinceLastWatered !== null && daysSinceLastWatered >= plantStatusThresholds.dangerDays,
+      },
+    );
+
     return (
       <div
         key={plant.id}
-        className={`border-4 ${
-          requiresCare ? "border-destructive" : "border-black"
-        } bg-card dark:bg-primary/10 text-card-foreground overflow-hidden neo-brutalist-shadow`}
+        className={cn(
+          `border-4 ${
+            requiresCare ? "border-destructive" : "border-black"
+          } text-card-foreground overflow-hidden neo-brutalist-shadow`,
+          backgroundColorClass
+        )}
       >
         <div className="flex items-center p-4">
           <div className="flex-grow">
@@ -113,7 +131,17 @@ export default function PlantList() {
           <div className="flex items-center gap-2">
             <Button
               onClick={() => addCareActivity(plant.id, { type: "watered" })}
-              className="bg-blue-500 hover:bg-blue-600 text-white border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+              className={cn(
+                "bg-blue-500 hover:bg-blue-600 text-white border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all",
+                {
+                  "animate-pulse":
+                    daysSinceLastWatered !== null &&
+                    daysSinceLastWatered >= plantStatusThresholds.warningDays &&
+                    daysSinceLastWatered < plantStatusThresholds.dangerDays,
+                  "animate-bounce":
+                    daysSinceLastWatered !== null && daysSinceLastWatered >= plantStatusThresholds.dangerDays,
+                },
+              )}
               size="icon"
             >
               <Droplet className="h-5 w-5" />

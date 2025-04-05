@@ -32,8 +32,14 @@ export type Plant = {
   lastWatered?: string
 }
 
+export interface PlantStatusThresholds {
+  warningDays: number;
+  dangerDays: number;
+}
+
 type PlantContextType = {
   plants: Plant[]
+  plantStatusThresholds: PlantStatusThresholds;
   addPlant: (plant: Omit<Plant, "id" | "schedules" | "careLog" | "imageUrls" | "archived">) => void
   updatePlant: (id: string, updates: Partial<Plant>) => void
   deletePlant: (id: string) => void
@@ -44,15 +50,23 @@ type PlantContextType = {
   addSchedule: (plantId: string, schedule: Omit<Schedule, "id" | "lastPerformed" | "nextDue" | "enabled">) => void
   addPhoto: (plantId: string, imageUrl: string) => void
   removePhoto: (plantId: string, imageUrl: string) => void
+  updateThresholds: (thresholds: PlantStatusThresholds) => void;
 }
 
 const PlantContext = createContext<PlantContextType | undefined>(undefined)
 
+const DEFAULT_THRESHOLDS: PlantStatusThresholds = {
+  warningDays: 14,
+  dangerDays: 30,
+};
+
 export function PlantProvider({ children }: { children: React.ReactNode }) {
   const [plants, setPlants] = useState<Plant[]>([])
+  const [plantStatusThresholds, setPlantStatusThresholds] = useState<PlantStatusThresholds>(DEFAULT_THRESHOLDS);
 
-  // Load plants from localStorage on initial render
+  // Load initial data from localStorage
   useEffect(() => {
+    // Load Plants
     const savedPlants = localStorage.getItem("plants")
     if (savedPlants) {
       setPlants(JSON.parse(savedPlants))
@@ -72,6 +86,25 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
       setPlants([samplePlant])
       localStorage.setItem("plants", JSON.stringify([samplePlant]))
     }
+
+    // Load Thresholds
+    const savedThresholds = localStorage.getItem("plantStatusThresholds");
+    if (savedThresholds) {
+      try {
+        const parsedThresholds = JSON.parse(savedThresholds);
+        // Basic validation to ensure structure matches
+        if (typeof parsedThresholds.warningDays === 'number' && typeof parsedThresholds.dangerDays === 'number') {
+           setPlantStatusThresholds(parsedThresholds);
+        } else {
+           localStorage.setItem("plantStatusThresholds", JSON.stringify(DEFAULT_THRESHOLDS));
+        }
+      } catch (error) {
+        console.error("Failed to parse thresholds from localStorage", error);
+        localStorage.setItem("plantStatusThresholds", JSON.stringify(DEFAULT_THRESHOLDS));
+      }
+    } else {
+      localStorage.setItem("plantStatusThresholds", JSON.stringify(DEFAULT_THRESHOLDS));
+    }
   }, [])
 
   // Save plants to localStorage whenever they change
@@ -80,6 +113,11 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("plants", JSON.stringify(plants))
     }
   }, [plants])
+
+  // Save thresholds to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("plantStatusThresholds", JSON.stringify(plantStatusThresholds));
+  }, [plantStatusThresholds]);
 
   const addPlant = (plant: Omit<Plant, "id" | "schedules" | "careLog" | "imageUrls" | "archived">) => {
     const newPlant: Plant = {
@@ -190,10 +228,15 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
     )
   }
 
+  const updateThresholds = (thresholds: PlantStatusThresholds) => {
+    setPlantStatusThresholds(thresholds);
+  };
+
   return (
     <PlantContext.Provider
       value={{
         plants,
+        plantStatusThresholds,
         addPlant,
         updatePlant,
         deletePlant,
@@ -204,6 +247,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
         addSchedule,
         addPhoto,
         removePhoto,
+        updateThresholds,
       }}
     >
       {children}
