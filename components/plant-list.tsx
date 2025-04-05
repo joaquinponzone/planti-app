@@ -1,7 +1,7 @@
 "use client"
 
 import { usePlants, type Plant, type PlantStatusThresholds } from "./plant-provider"
-import { Droplet, MoreVertical, NotebookText, Trash2, Pencil, ChevronsUpDown, CheckCheck, AlarmClockCheck } from "lucide-react"
+import { Droplet, MoreVertical, NotebookText, Trash2, Pencil, ChevronsUpDown, AlarmClockCheck, ListChecks } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -241,17 +241,16 @@ export default function PlantList() {
             {allPlantsGreen ? (
               <Collapsible defaultOpen={true}>
                 <CollapsibleTrigger asChild>
-                  <div className="flex items-center w-full justify-between gap-1 text-lg font-semibold capitalize border-b-4 border-black hover:text-muted-foreground dark:hover:text-accent transition-colors">
-                  <button className="flex items-center gap-1 text-lg font-semibold capitalize hover:text-muted-foreground dark:hover:text-accent transition-colors">
-                    {location}
-                    <span className="flex items-center gap-2">
-                      <CheckCheck className="size-5 text-secondary" />
-                    </span>
-                  </button>
-                  <span className="flex items-center gap-2 rounded px-2 py-1">
-                    <ChevronsUpDown className="size-4" />
-                  </span>
-                  </div>
+                    <button className="flex items-center gap-2 text-lg font-semibold capitalize hover:text-muted-foreground dark:hover:text-accent transition-colors border-b-4 border-black pb-1">
+                      {location}
+                      <span className="flex items-center gap-2">
+                        <ListChecks className="size-5 text-black p-0" />
+                        <Badge className="size-6 p-0.5 border-2 border-black">
+                          <ChevronsUpDown className="size-5 text-black p-0" />
+                        </Badge>
+                      </span>
+                    </button>
+
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
                  {plantGrid}
@@ -259,18 +258,14 @@ export default function PlantList() {
               </Collapsible>
             ) : (
               <>
-                <h2 className="flex items-center gap-2 text-lg font-semibold capitalize border-b-4 border-black w-fit">
+                <h2 className="flex items-center gap-2 text-lg font-semibold capitalize border-b-4 border-black w-fit pb-1">
                   {location}
                   <span className="flex items-center gap-2">
                     <AlarmClockCheck className="size-5" />
-                    {plantsInDanger.length > 0 ? <Badge variant="outline" className={cn("bg-secondary text-white", {
-                      "bg-red-500": plantsInDanger.length > 1
-                    })}>
+                    {plantsInDanger.length > 0 ? <Badge variant="destructive">
                       {plantsInDanger.length}
                     </Badge> : null}
-                    {plantsInWarning.length > 0 ? <Badge variant="outline" className={cn("bg-secondary text-white", {
-                      "bg-yellow-500": plantsInWarning.length > 1
-                    })}>
+                    {plantsInWarning.length > 0 ? <Badge variant="outline">
                       {plantsInWarning.length}
                     </Badge> : null}
                   </span>
