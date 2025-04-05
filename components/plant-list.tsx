@@ -265,7 +265,7 @@ export default function PlantList() {
                     {plantsInDanger.length > 0 ? <Badge variant="destructive">
                       {plantsInDanger.length}
                     </Badge> : null}
-                    {plantsInWarning.length > 0 ? <Badge variant="outline">
+                    {plantsInWarning.length > 0 ? <Badge className="bg-yellow-500">
                       {plantsInWarning.length}
                     </Badge> : null}
                   </span>
