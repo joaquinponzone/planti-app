@@ -31,7 +31,7 @@ const email = z.email("Ese email no parece válido").transform(normalizeEmail)
 const newPassword = z
   .string()
   .min(PASSWORD_MIN_LENGTH, `Usá al menos ${PASSWORD_MIN_LENGTH} caracteres`)
-  .refine((v) => new TextEncoder().encode(v).length <= PASSWORD_MAX_BYTES, "Esa contraseña es demasiado larga")
+  .refine((v) => new TextEncoder().encode(v).length <= PASSWORD_MAX_BYTES, "Esa contraseña es demasiado larga: usá hasta 72 caracteres")
 
 export const LoginSchema = z.object({
   email,

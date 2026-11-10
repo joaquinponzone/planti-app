@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Planti · ¡Mantené vivas a tus plantas!",
-  description: "Planti es una app simple para cuidar tus plantas: anotá cuándo las regaste, fertilizaste o trasplantaste, y recibí un aviso cuando te necesiten.",
+  description: "Planti es una app simple para cuidar tus plantas: anotá cuándo las regaste, fertilizaste o trasplantaste, y mirá cuáles hace mucho que no riegás.",
 }
 
 export default function RootLayout({

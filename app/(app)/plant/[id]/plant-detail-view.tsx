@@ -120,6 +120,7 @@ export function PlantDetailView({
           </div>
         </div>
 
+        <h2 className="mb-2 text-lg font-bold">Registrar un cuidado</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pb-4">
           {CARE_ACTIVITIES.filter((a) => !ACTIVITIES_WITH_NOTES.includes(a.type)).map((activity) => (
             <QuickActivityButton key={activity.type} plantId={plant.id} activity={activity} />

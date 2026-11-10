@@ -33,7 +33,7 @@ export default async function Home() {
               className="flex items-center gap-2 bg-primary/30 dark:bg-primary dark:hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 border-2 border-black neo-brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none w-fit"
             >
               <PlusCircle size={20} />
-              <span>Nueva planta</span>
+              <span>Agregar planta</span>
             </Link>
           </div>
         </header>

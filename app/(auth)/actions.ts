@@ -28,7 +28,7 @@ export type FormState = {
 }
 
 const INVALID_CREDENTIALS = "Email o contraseña incorrectos"
-const INVALID_LINK = "El enlace venció, ya se usó o lo reemplazó uno más nuevo."
+const INVALID_LINK = "El enlace venció, ya se usó o pediste uno más nuevo."
 const GENERIC_EMAIL_SENT = "Si hay una cuenta con ese email, te mandamos un enlace. Revisá tu bandeja de entrada."
 
 function firstIssue(error: { issues: { message: string }[] }): FormState {

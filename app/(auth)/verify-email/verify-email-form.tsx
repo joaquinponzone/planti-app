@@ -48,7 +48,7 @@ export function VerifyEmailForm({ token, email }: { token?: string; email?: stri
           : "Te mandamos un email. Seguí el enlace para continuar."
       }
     >
-      <p className="mb-6">El enlace vence en 24 horas. Fijate también en la carpeta de spam.</p>
+      <p className="mb-6">Si no aparece en unos minutos, fijate en la carpeta de spam.</p>
       {email && (
         <form action={resendAction} className="space-y-3">
           <input type="hidden" name="email" value={email} />
@@ -60,7 +60,7 @@ export function VerifyEmailForm({ token, email }: { token?: string; email?: stri
       )}
       <p className="mt-6 text-sm">
         <Link href="/login" className="underline underline-offset-4">
-          Volver a entrar
+          Volver al inicio de sesión
         </Link>
       </p>
     </AuthCard>

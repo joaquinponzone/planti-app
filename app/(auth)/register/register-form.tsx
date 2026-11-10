@@ -13,7 +13,7 @@ export function RegisterForm() {
   const [state, action] = useActionState<FormState, FormData>(register, {})
 
   return (
-    <AuthCard title="Creá tu cuenta" subtitle="Tus plantas en todos tus dispositivos, con avisos cuando te necesiten.">
+    <AuthCard title="Creá tu cuenta" subtitle="Tus plantas y su historial, en el celu y en la compu.">
       <form action={action} className="space-y-6">
         <FormMessage error={state.error} />
         <Field label="Email" name="email" type="email" autoComplete="email" required />

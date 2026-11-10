@@ -6,13 +6,13 @@ const optionalText = (max: number) =>
   z
     .string()
     .trim()
-    .max(max, `Usá menos de ${max} caracteres`)
+    .max(max, `Usá hasta ${max} caracteres`)
     .transform((v) => (v === "" ? null : v))
     .nullable()
     .default(null)
 
 export const PlantSchema = z.object({
-  name: z.string().trim().min(1, "Ponele un nombre a tu planta").max(100, "Usá menos de 100 caracteres"),
+  name: z.string().trim().min(1, "Ponele un nombre a tu planta").max(100, "Usá hasta 100 caracteres"),
   scientificName: optionalText(100),
   location: optionalText(100),
   notes: optionalText(2000),
@@ -30,6 +30,6 @@ export const ThresholdsSchema = z
     dangerDays: z.coerce.number().int("Usá días enteros").min(1, "Usá al menos 1 día").max(365, "Usá como mucho 365 días"),
   })
   .refine((t) => t.dangerDays > t.warningDays, {
-    message: "El peligro tiene que llegar después del aviso",
+    message: "Peligro tiene que tener más días que Aviso",
     path: ["dangerDays"],
   })
