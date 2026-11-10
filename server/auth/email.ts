@@ -38,7 +38,10 @@ const COPY: Record<AuthEmailKind, { path: string; subject: string; heading: stri
   verify_email: {
     path: "/verify-email",
     subject: "Confirmá tu email en Planti",
-    heading: "Te damos la bienvenida a Planti 🌱",
+    // 🪴 es el mismo dibujo que el favicon. El espacio antes es irrompible
+    // ( ): si el título no entra en una línea, el emoji baja junto con
+    // "Planti" en vez de quedar solo en el renglón de abajo.
+    heading: "Te damos la bienvenida a Planti 🪴",
     body: "Confirmá tu email para empezar a cuidar tus plantas.",
     cta: "Confirmar mi email",
     expiry: "El enlace vence en 24 horas.",
