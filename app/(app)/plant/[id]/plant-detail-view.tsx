@@ -187,7 +187,7 @@ export function PlantDetailView({
       </div>
 
       <Dialog open={!!activityToDelete} onOpenChange={(open) => !open && setActivityToDelete(null)}>
-        <DialogContent className="border-4 border-black dark:border-white bg-card neo-brutalist-shadow sm:max-w-[425px]">
+        <DialogContent className="border-4 border-black dark:border-white bg-background neo-brutalist-shadow sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Borrar del historial</DialogTitle>
             <DialogDescription className="text-base text-muted-foreground">
