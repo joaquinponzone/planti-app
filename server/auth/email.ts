@@ -61,20 +61,70 @@ const COPY: Record<AuthEmailKind, { path: string; subject: string; heading: stri
   },
 }
 
+/**
+ * Los colores de `app/globals.css`, en hex: los clientes de correo no
+ * entienden las variables CSS ni `hsl()` en todos lados.
+ */
+const COLORS = {
+  background: "#EDF7ED", // --background
+  primary: "#BCE1BC", // --primary (los botones)
+  ink: "#0A0A0A", // --foreground
+  muted: "#737373", // --muted-foreground
+}
+
+const FONT = "Inter,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif"
+
+/*
+ * Notas de compatibilidad, para quien toque el HTML:
+ * - Tablas y estilos inline: es lo único que Gmail y Outlook respetan igual.
+ * - La sombra neo-brutalista de la app (`box-shadow: 4px 4px 0 #000`) no
+ *   existe en Gmail: la descarta. Se imita con los bordes derecho e inferior
+ *   más gruesos que los otros dos.
+ * - El preheader es el texto que el cliente muestra al lado del asunto en la
+ *   bandeja de entrada. Va oculto en el cuerpo.
+ */
 export function buildAuthEmail(kind: AuthEmailKind, token: string) {
   const copy = COPY[kind]
   const url = `${appUrl()}${copy.path}?token=${encodeURIComponent(token)}`
+  const e = escapeHtml
   const html = `<!doctype html>
-<html lang="es"><body style="margin:0;padding:24px;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#111">
-  <div style="max-width:480px;margin:0 auto;background:#fff;border:4px solid #000;padding:24px;box-shadow:6px 6px 0 #000">
-    <h1 style="margin:0 0 16px;font-size:24px">${escapeHtml(copy.heading)}</h1>
-    <p style="margin:0 0 24px;font-size:16px;line-height:1.5">${escapeHtml(copy.body)}</p>
-    <a href="${escapeHtml(url)}" style="display:inline-block;background:#22c55e;color:#000;font-weight:bold;text-decoration:none;padding:12px 20px;border:3px solid #000">${escapeHtml(copy.cta)}</a>
-    <p style="margin:24px 0 0;font-size:13px;color:#555;line-height:1.5">${escapeHtml(copy.expiry)}</p>
-    <p style="margin:12px 0 0;font-size:12px;color:#777;word-break:break-all">${escapeHtml(url)}</p>
-  </div>
-</body></html>`
-  const text = `${copy.heading}\n\n${copy.body}\n\n${url}\n\n${copy.expiry}`
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Language" content="es">
+<title>${e(copy.subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:${COLORS.background}">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">${e(copy.body)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${COLORS.background}">
+  <tr><td align="center" style="padding:32px 16px">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px">
+      <tr><td lang="es" style="padding:0 0 20px;font-family:${FONT};color:${COLORS.ink}">
+        <div style="font-size:36px;line-height:1;font-weight:900;letter-spacing:-1px">Planti</div>
+        <div style="margin-top:6px;font-size:16px;font-weight:500;color:${COLORS.muted}">¡Mantené vivas a tus plantas!</div>
+      </td></tr>
+      <tr><td lang="es" style="background:#ffffff;border:4px solid ${COLORS.ink};border-right-width:8px;border-bottom-width:8px;padding:28px 24px;font-family:${FONT};color:${COLORS.ink}">
+        <h1 style="margin:0 0 16px;padding:0 0 8px;border-bottom:4px solid ${COLORS.ink};font-size:26px;line-height:1.25;font-weight:700">${e(copy.heading)}</h1>
+        <p style="margin:0 0 28px;font-size:17px;line-height:1.5">${e(copy.body)}</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="background:${COLORS.primary};border:3px solid ${COLORS.ink};border-right-width:6px;border-bottom-width:6px">
+            <a href="${e(url)}" style="display:inline-block;padding:14px 24px;font-family:${FONT};font-size:18px;font-weight:700;color:${COLORS.ink};text-decoration:none">${e(copy.cta)}</a>
+          </td>
+        </tr></table>
+        <p style="margin:28px 0 0;font-size:14px;line-height:1.5;color:${COLORS.muted}">${e(copy.expiry)}</p>
+        <p style="margin:16px 0 0;font-size:13px;line-height:1.5;color:${COLORS.muted}">Si el botón no funciona, copiá este enlace en el navegador:<br>
+          <a href="${e(url)}" style="color:${COLORS.ink};word-break:break-all">${e(url)}</a></p>
+      </td></tr>
+      <tr><td lang="es" style="padding:20px 4px 0;font-family:${FONT};font-size:12px;line-height:1.5;color:${COLORS.muted}">
+        Recibiste este email porque alguien usó esta dirección en Planti.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`
+  const text = `${copy.heading}\n\n${copy.body}\n\n${copy.cta}: ${url}\n\n${copy.expiry}\n\n--\nPlanti · Recibiste este email porque alguien usó esta dirección en Planti.`
   return { subject: copy.subject, html, text, url }
 }
 
