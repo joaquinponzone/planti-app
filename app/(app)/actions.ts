@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
+import { BackupError, planImportFromText } from "@/lib/backup"
 import { requireUser } from "@/lib/dal"
+import { applyImport, type ImportResult } from "@/server/backup/import"
+import { db } from "@/server/db"
 import { CareActivitySchema, PlantSchema, ThresholdsSchema } from "@/lib/plant-validation"
 import * as plants from "@/server/plants/mutations"
 
@@ -83,4 +86,26 @@ export async function updateThresholds(_prev: ActionState, formData: FormData): 
   await plants.updateThresholds(user.id, parsed.data.warningDays, parsed.data.dangerDays)
   revalidatePath("/")
   return {}
+}
+
+/**
+ * Importa un backup. Recibe el TEXTO del archivo, no el plan que armó el
+ * navegador para la vista previa: la conversión se vuelve a hacer acá, con
+ * los mismos topes y validaciones. Lo que manda el cliente no se acepta tal cual.
+ */
+export async function importBackup(text: string): Promise<{ error?: string; result?: ImportResult }> {
+  const user = await requireUser()
+  if (typeof text !== "string") return { error: "No llegó ningún archivo." }
+
+  let plan
+  try {
+    plan = planImportFromText(text)
+  } catch (error) {
+    if (error instanceof BackupError) return { error: error.message }
+    throw error
+  }
+
+  const result = await applyImport(db, user.id, plan)
+  revalidatePath("/")
+  return { result }
 }

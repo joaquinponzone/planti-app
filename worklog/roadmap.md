@@ -15,6 +15,7 @@ Actualizado: 2026-11-10
 | 4a | Plantas en la base (sin `localStorage`) | ✅ | [plantas](2026-11-10-plantas-en-la-base.md) |
 | 4b | Script de importación del backup | ✅ (falta correrlo en producción) | [import y tests](2026-11-10-import-backup-y-tests.md) |
 | — | UI en español | ✅ | [ui en español](2026-11-10-ui-en-espanol.md) |
+| — | Exportar e importar los datos de la cuenta | ✅ | [exportar e importar](2026-11-10-exportar-importar.md) |
 | 5 | PWA: manifest y service worker | pendiente | — |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
@@ -38,10 +39,10 @@ Antes de mergear a `main`:
 
 Después de mergear:
 
-1. La usuaria hace **Export** en la versión vieja *antes* del deploy (si no, ya no tiene el
-   botón) y se registra en la nueva.
-2. `bun scripts/import-backup.ts <backup.json> <email> --dry-run` contra Turso, y después
-   sin `--dry-run`.
+1. La usuaria ya tiene su backup (Export de la versión vieja, 44 plantas). Se registra en
+   la nueva y lo sube ella desde **Cuenta → Importar un backup**.
+2. Si algo falla en la pantalla, el plan B es `bun scripts/import-backup.ts <backup.json>
+   <email> --dry-run` contra Turso.
 
 ## Después
 
@@ -63,8 +64,6 @@ Después de mergear:
   que el aviso llegaría a la misma hora para todos (por ejemplo, 9 AM de Argentina).
   Respetar la hora local de cada usuario requiere el plan Pro o un cron externo. Hay que
   decidirlo antes del paso 6. `users.timezone` y `users.lastReminderOn` ya existen.
-- **Export de la cuenta.** Se sacó con el menú Data (D-007). ¿Hace falta una descarga del
-  JSON desde el servidor?
 - **Borrar la cuenta.** Se mencionó como parte de "pedir lo mínimo" (D-004) y no está
   hecho.
 

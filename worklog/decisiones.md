@@ -4,6 +4,31 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-010 · Exportar e importar los datos de la cuenta, desde la app
+
+2026-11-10
+
+**Decisión:** cada usuario puede descargar sus datos (`/api/export`, formato v2) e
+importar un backup (`/import`), tanto v2 como el formato viejo de `localStorage`.
+Importar **sólo agrega**: nunca borra ni modifica. Reemplaza en parte a D-007 y D-008.
+
+**Por qué:** es portabilidad de los datos de la cuenta, no un resto del modo local
+(lo que descartó D-007). Y resuelve el backup de la usuaria sin que el admin tenga que
+correr un script por ella.
+
+**Reglas:**
+- Vista previa en el navegador con la misma conversión (`lib/backup.ts`); el servidor
+  la vuelve a hacer al confirmar y no acepta lo que arma el cliente.
+- Importar dos veces el mismo archivo v2 no duplica, sea de la propia cuenta o de otra
+  (ids derivados de cuenta + id original). El formato viejo no lo permite: la vista
+  previa avisa si la cuenta ya tiene plantas.
+- Umbrales y zona horaria del backup se aplican **sólo si la cuenta está vacía**.
+- Todo en un único `batch`: un viaje a la base y atómico.
+
+**Descartado:** "reemplazar todo" (un archivo equivocado borraría la cuenta).
+`scripts/import-backup.ts` se mantiene como herramienta de administración, sobre el
+mismo código.
+
 ## D-009 · UI solo en español, sin framework de i18n
 
 2026-11-10
@@ -22,6 +47,9 @@ pero sus usuarias no).
 
 ## D-008 · La importación del backup es un script, no una función de la app
 
+> **Reemplazada por D-010:** la importación pasó a la app. El script queda como
+> herramienta de administración.
+
 2026-11-10
 
 **Decisión:** los datos de `localStorage` se pasan a la base con `scripts/import-backup.ts`
@@ -37,6 +65,9 @@ sería código para un caso que no existe.
 D-004 por la puerta de atrás.
 
 ## D-007 · Sin export/import de localStorage
+
+> **En parte reemplazada por D-010:** volvió el export/import, pero de los datos de la
+> cuenta y desde el servidor.
 
 2026-11-10
 
