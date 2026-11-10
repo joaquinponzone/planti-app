@@ -139,6 +139,65 @@ describe("formato viejo (export de localStorage)", () => {
   })
 })
 
+describe("importar dos veces un backup del formato viejo", () => {
+  // Sus ids no sirven: la planta se reconoce por nombre, ubicación e historial.
+  const riego = (iso: string) => ({ type: "watered", date: iso })
+  const legacy = (...plantsInFile: { name: string; location?: string; careLog?: unknown[] }[]) => ({ plants: plantsInFile })
+
+  test("el mismo archivo otra vez no duplica nada (lo que pasaba con el backup real)", async () => {
+    const user = await createUser()
+    expect((await applyImport(db, user.id, planImport(realBackup))).imported).toBe(1)
+    expect(await applyImport(db, user.id, planImport(realBackup))).toMatchObject({ imported: 0, skipped: 1, activities: 0 })
+    expect(await db.$count(plants, eq(plants.userId, user.id))).toBe(1)
+  })
+
+  test("se sigue reconociendo aunque se haya regado después de importar", async () => {
+    const user = await createUser()
+    const file = legacy({ name: "Ficus", location: "Living", careLog: [riego("2026-10-01T10:00:00Z")] })
+    await applyImport(db, user.id, planImport(file))
+    const [ficus] = await listPlants(user.id)
+    await M.addCareActivity(user.id, ficus.id, "watered", null)
+
+    expect(await applyImport(db, user.id, planImport(file))).toMatchObject({ imported: 0, skipped: 1 })
+  })
+
+  test("mismo nombre pero otra ubicación u otro historial es otra planta", async () => {
+    const user = await createUser()
+    await applyImport(db, user.id, planImport(legacy({ name: "Potus", location: "Living", careLog: [riego("2026-10-01T10:00:00Z")] })))
+
+    const result = await applyImport(
+      db,
+      user.id,
+      planImport(
+        legacy(
+          { name: "Potus", location: "Taller", careLog: [riego("2026-10-01T10:00:00Z")] },
+          { name: "Potus", location: "Living", careLog: [riego("2026-10-05T10:00:00Z")] },
+        ),
+      ),
+    )
+    expect(result).toMatchObject({ imported: 2, skipped: 0 })
+  })
+
+  test("dos plantas iguales en el archivo necesitan dos en la cuenta para saltearse", async () => {
+    const user = await createUser()
+    const twin = { name: "Potus", location: "Living", careLog: [riego("2026-10-01T10:00:00Z")] }
+    await applyImport(db, user.id, planImport(legacy(twin)))
+
+    // El archivo trae dos: una ya está, la otra es nueva.
+    expect(await applyImport(db, user.id, planImport(legacy(twin, twin)))).toMatchObject({ imported: 1, skipped: 1 })
+    // Ahora la cuenta tiene las dos: no entra ninguna.
+    expect(await applyImport(db, user.id, planImport(legacy(twin, twin)))).toMatchObject({ imported: 0, skipped: 2 })
+    expect(await db.$count(plants, eq(plants.userId, user.id))).toBe(2)
+  })
+
+  test("una planta creada a mano con el mismo nombre no tapa a la del archivo", async () => {
+    const user = await createUser()
+    await M.createPlant(user.id, fields("Monstera", "Living"))
+    const file = legacy({ name: "Monstera", location: "Living", careLog: [riego("2026-10-01T10:00:00Z")] })
+    expect(await applyImport(db, user.id, planImport(file))).toMatchObject({ imported: 1, skipped: 0 })
+  })
+})
+
 describe("exportar e importar (formato v2)", () => {
   async function seededUser() {
     const user = await createUser()

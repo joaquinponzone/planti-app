@@ -21,6 +21,7 @@ Actualizado: 2026-11-10
 | — | Pasada por el navegador y formularios que no pierden lo escrito | ✅ | [pasada](2026-11-10-pasada-navegador.md) |
 | — | Filtro por estado de riego (Peligro, Aviso, Al día) | ✅ | [filtro](2026-11-10-filtro-por-estado.md) |
 | — | Ambientes plegables y "Plegar todos" | ✅ | [plegar](2026-11-10-ambientes-plegables.md) |
+| — | Importar dos veces un backup viejo ya no duplica | ✅ | [import](2026-11-10-import-sin-duplicados.md) |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 

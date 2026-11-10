@@ -60,8 +60,8 @@ async function main() {
     if (!user) throw new Error(`No hay ninguna cuenta con ${email}. Tiene que registrarse antes.`)
 
     const existing = await db.$count(schema.plants, eq(schema.plants.userId, user.id))
-    if (existing > 0 && plan.format === "legacy") {
-      console.log(`\n⚠ ${email} ya tiene ${existing} planta(s). Este formato no permite detectar duplicados.`)
+    if (existing > 0) {
+      console.log(`\n${email} ya tiene ${existing} planta(s): las que ya estén no se repiten.`)
     }
 
     if (flags.has("--dry-run")) {

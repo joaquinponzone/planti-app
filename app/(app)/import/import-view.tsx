@@ -101,10 +101,9 @@ export function ImportView({ existingPlants }: { existingPlants: number }) {
                   : "Las alertas de riego del backup no se aplican: tu cuenta ya tiene plantas y se respeta tu configuración."}
               </p>
             )}
-            {plan.format === "legacy" && existingPlants > 0 && (
+            {existingPlants > 0 && (
               <p className="mt-2 text-sm font-medium">
-                Ya tenés {plural(existingPlants, "planta", "plantas")}. Este backup es de la versión anterior y no permite
-                detectar repetidas: si ya lo importaste, se van a duplicar.
+                Ya tenés {plural(existingPlants, "planta", "plantas")}. Las que ya estén en tu cuenta no se repiten.
               </p>
             )}
           </div>

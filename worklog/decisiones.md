@@ -4,6 +4,29 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-015 · Un backup viejo se reconoce por nombre, ubicación e historial
+
+2026-11-10
+
+**Decisión:** al importar un backup del formato viejo, una planta se saltea si la cuenta
+ya tiene una con el mismo nombre y ubicación cuyo historial contiene todos sus cuidados
+(mismo tipo y mismo instante). Cada planta de la cuenta empareja con una sola del archivo.
+
+**Por qué:** importar dos veces el mismo archivo viejo duplicaba todas las plantas (pasó
+con el backup real: 121 plantas de 44). Los ids de ese formato no sirven y la pantalla
+sólo avisaba; un aviso no alcanza.
+
+**Reglas:**
+- "Contiene" y no "es igual": regar después de importar no puede romper el reconocimiento.
+- Una planta creada a mano con el mismo nombre no tapa a la del archivo si no tiene ese
+  historial.
+- Dos plantas del archivo sin cuidados, mismo nombre y ubicación, sólo se distinguen por
+  cantidad: es el único caso donde dos plantas distintas se pueden confundir.
+
+**Descartado:** usar los ids viejos con un prefijo (no quedan guardados en ningún lado,
+así que no reconocen lo importado antes) y un script para borrar las copias que ya
+estaban (se borran a mano y se vuelve a importar).
+
 ## D-014 · Ambientes plegables, recordados en una cookie del dispositivo
 
 2026-11-10
