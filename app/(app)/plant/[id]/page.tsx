@@ -53,6 +53,7 @@ export default function PlantDetail() {
     if (params.id) {
       const foundPlant = getPlant(params.id as string)
       if (foundPlant) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- lee localStorage; se reemplaza al pasar los datos al servidor (paso 4)
         setPlant(foundPlant)
       } else {
         router.push("/")

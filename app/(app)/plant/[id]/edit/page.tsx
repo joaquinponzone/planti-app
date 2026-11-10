@@ -25,6 +25,7 @@ export default function EditPlant() {
     if (params.id) {
       const foundPlant = getPlant(params.id as string)
       if (foundPlant) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- lee localStorage; se reemplaza al pasar los datos al servidor (paso 4)
         setPlant(foundPlant)
         setFormData({
           name: foundPlant.name,

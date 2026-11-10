@@ -1,0 +1,113 @@
+import "server-only"
+
+import { Resend } from "resend"
+
+export type AuthEmailKind =
+  /** Confirmar el email después de registrarse. */
+  | "verify_email"
+  /** Recuperar la contraseña. */
+  | "reset_password"
+  /**
+   * Alguien intentó registrarse con un email que ya tiene cuenta. El
+   * registro responde lo mismo que siempre (para no revelar qué emails
+   * existen) y el aviso llega sólo al dueño del buzón, con un link de reset.
+   */
+  | "already_registered"
+
+export function appUrl(): string {
+  if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, "")
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  return "http://localhost:3000"
+}
+
+function escapeHtml(value: string): string {
+  const entities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }
+  return value.replace(/[&<>"']/g, (c) => entities[c])
+}
+
+const COPY: Record<AuthEmailKind, { path: string; subject: string; heading: string; body: string; cta: string; expiry: string }> = {
+  verify_email: {
+    path: "/verify-email",
+    subject: "Confirm your email for Planti",
+    heading: "Welcome to Planti 🌱",
+    body: "Confirm your email to start taking care of your plants.",
+    cta: "Confirm my email",
+    expiry: "This link expires in 24 hours.",
+  },
+  reset_password: {
+    path: "/reset-password",
+    subject: "Reset your Planti password",
+    heading: "Reset your password",
+    body: "Someone asked to reset the password of your Planti account. If it was you, choose a new one:",
+    cta: "Choose a new password",
+    expiry: "This link expires in 30 minutes. If you didn't ask for it, you can ignore this email.",
+  },
+  already_registered: {
+    path: "/reset-password",
+    subject: "You already have a Planti account",
+    heading: "You already have an account",
+    body: "Someone tried to sign up to Planti with this email, but it already has an account. If it was you and you don't remember your password, you can choose a new one:",
+    cta: "Choose a new password",
+    expiry: "This link expires in 30 minutes. If it wasn't you, you can ignore this email.",
+  },
+}
+
+export function buildAuthEmail(kind: AuthEmailKind, token: string) {
+  const copy = COPY[kind]
+  const url = `${appUrl()}${copy.path}?token=${encodeURIComponent(token)}`
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:24px;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#111">
+  <div style="max-width:480px;margin:0 auto;background:#fff;border:4px solid #000;padding:24px;box-shadow:6px 6px 0 #000">
+    <h1 style="margin:0 0 16px;font-size:24px">${escapeHtml(copy.heading)}</h1>
+    <p style="margin:0 0 24px;font-size:16px;line-height:1.5">${escapeHtml(copy.body)}</p>
+    <a href="${escapeHtml(url)}" style="display:inline-block;background:#22c55e;color:#000;font-weight:bold;text-decoration:none;padding:12px 20px;border:3px solid #000">${escapeHtml(copy.cta)}</a>
+    <p style="margin:24px 0 0;font-size:13px;color:#555;line-height:1.5">${escapeHtml(copy.expiry)}</p>
+    <p style="margin:12px 0 0;font-size:12px;color:#777;word-break:break-all">${escapeHtml(url)}</p>
+  </div>
+</body></html>`
+  const text = `${copy.heading}\n\n${copy.body}\n\n${url}\n\n${copy.expiry}`
+  return { subject: copy.subject, html, text, url }
+}
+
+let resend: Resend | null = null
+
+/**
+ * El remitente. `RESEND_FROM_DOMAIN` tiene que estar verificado en Resend.
+ *
+ * Sin dominio cae en `onboarding@resend.dev`, la dirección de prueba de
+ * Resend, que sólo entrega a la dirección dueña de la cuenta: sirve para
+ * probar en local con una clave real, pero en Vercel los usuarios no
+ * recibirían nada. Por eso allá es obligatorio.
+ */
+function fromAddress(): string {
+  const domain = process.env.RESEND_FROM_DOMAIN?.trim()
+  if (domain) return `Planti <noreply@${domain}>`
+  if (process.env.VERCEL) throw new Error("Falta RESEND_FROM_DOMAIN.")
+  return "Planti <onboarding@resend.dev>"
+}
+
+/**
+ * Manda el email. En local, sin `RESEND_API_KEY`, imprime el link en la
+ * consola de `next dev` en vez de mandarlo: se puede probar todo el flujo sin
+ * configurar nada. En Vercel no hay atajo: sin la clave, falla.
+ */
+export async function sendAuthEmail(to: string, kind: AuthEmailKind, token: string): Promise<void> {
+  const email = buildAuthEmail(kind, token)
+  const apiKey = process.env.RESEND_API_KEY
+
+  if (!apiKey) {
+    if (process.env.VERCEL) throw new Error("Falta RESEND_API_KEY.")
+    console.log(`\n📧 [email de desarrollo] ${kind} → ${to}\n   ${email.url}\n`)
+    return
+  }
+
+  resend ??= new Resend(apiKey)
+  const { error } = await resend.emails.send({
+    from: fromAddress(),
+    to,
+    subject: email.subject,
+    html: email.html,
+    text: email.text,
+  })
+  if (error) throw new Error(`Resend rechazó el email: ${error.message}`)
+}
