@@ -69,6 +69,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
     // Load Plants
     const savedPlants = localStorage.getItem("plants")
     if (savedPlants) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- lee localStorage; se reemplaza al pasar los datos al servidor (paso 4)
       setPlants(JSON.parse(savedPlants))
     } else {
       // Add sample plant if none exist

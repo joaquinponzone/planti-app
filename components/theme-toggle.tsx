@@ -2,17 +2,22 @@
 
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { useSyncExternalStore } from "react"
 
 import { Button } from "@/components/ui/button"
 
-export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false)
-  const { setTheme, theme } = useTheme()
+const noopSubscribe = () => () => {}
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+export function ThemeToggle() {
+  // false en el render del servidor (y en la hidratación), true en el cliente.
+  // El tema recién se conoce en el navegador: renderizar el ícono antes
+  // provocaría un mismatch de hidratación.
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  )
+  const { setTheme, theme } = useTheme()
 
   if (!mounted) {
     return null

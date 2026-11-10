@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePlants, type PlantStatusThresholds } from "./plant-provider";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -22,14 +22,6 @@ export function ConfigPopover() {
     dangerDays: plantStatusThresholds.dangerDays,
   });
   const [isOpen, setIsOpen] = useState(false);
-
-  // Use useEffect to update local state when context changes
-  useEffect(() => {
-    setLocalThresholds({
-        warningDays: plantStatusThresholds.warningDays,
-        dangerDays: plantStatusThresholds.dangerDays,
-    });
-  }, [plantStatusThresholds]);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -72,8 +64,15 @@ export function ConfigPopover() {
 
   function handleOpenChange(open: boolean) {
     setIsOpen(open);
-    // If popover is closing without saving, reset local state
-    if (!open) {
+    // Al abrir se copian los valores vigentes, en vez de sincronizarlos con un
+    // efecto: el formulario arranca siempre desde lo guardado, aunque los
+    // umbrales hayan cambiado (o terminado de cargar) con el popover cerrado.
+    if (open) {
+        setLocalThresholds({
+            warningDays: plantStatusThresholds.warningDays,
+            dangerDays: plantStatusThresholds.dangerDays,
+        });
+    } else {
         handleCancel();
     }
   }
