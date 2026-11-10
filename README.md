@@ -1,73 +1,85 @@
-# Planti App
+# Planti
 
-A modern web application built with Next.js 14, TypeScript, and React.
+App para cuidar plantas: anotar cuándo se regó, fertilizó o trasplantó cada una y ver
+cuáles hace mucho que no se riegan. Cada persona tiene su cuenta y sus datos viven en la
+nube. Se puede instalar como app (PWA).
 
-## 🌟 Features
+## Stack
 
-- Modern, responsive UI built with Next.js App Router and React Server Components
-- Beautiful component library using Shadcn UI and Radix UI
-- Type-safe development with TypeScript
-- State management with local storage persistence
-- Mobile-first responsive design with Tailwind CSS
+- Next.js 16 (App Router, Server Actions) y React 19
+- Turso (libSQL) con Drizzle ORM y migraciones versionadas
+- Auth propia: email y contraseña, sesión en un JWT firmado (`jose`), contraseñas con bcrypt
+- Resend para los emails (confirmar cuenta, recuperar contraseña)
+- Tailwind CSS con componentes de Radix/shadcn
+- bun para instalar, correr scripts y testear
+- Deploy en Vercel
 
-## 🚀 Tech Stack
+## Desarrollo local
 
-### Frontend
-- Next.js 14 with App Router
-- TypeScript
-- React Server Components
-- Shadcn UI / Radix UI
-- Tailwind CSS
-- Local storage for state persistence
+```bash
+bun install
+cp .env.example .env   # todo puede quedar vacío en local
+bun run db:migrate     # crea local.db
+bun dev
+```
 
-## 📦 Prerequisites
+Sin variables, la app usa `file:local.db` y los links de los emails se imprimen en la
+consola en vez de mandarse. Para registrarte, abrí el link de confirmación que aparece ahí.
 
-- Node.js 18.x or later
-- Bun (recommended)
+## Variables de entorno
 
-## 🛠️ Setup Instructions
+Ver [`.env.example`](.env.example).
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd planti-app
-   ```
+| Variable | Local | Vercel |
+|---|---|---|
+| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | opcionales (sin ellas, `local.db`) | obligatorias |
+| `AUTH_SECRET` | opcional | obligatoria, 32 caracteres o más |
+| `RESEND_API_KEY`, `RESEND_FROM_DOMAIN` | opcionales (sin ellas, consola) | obligatorias |
+| `APP_URL` | opcional | opcional (por defecto, el dominio de producción) |
 
-2. Install dependencies:
-   ```bash
-   bun install
-   ```
+En Vercel, Preview necesita su propia base y su propio `AUTH_SECRET`, distintos de los de
+producción. `bun run db:migrate` frena el build si un preview apunta a la base de producción.
 
-3. Set up environment variables:
-   ```bash
-   cp .env.example .env.local
-   ```
-   Fill in the required environment variables in `.env.local`
+## Scripts
 
-4. Run the development server:
-   ```bash
-   bun dev
-   ```
+| Comando | Qué hace |
+|---|---|
+| `bun dev` | Servidor de desarrollo |
+| `bun run build` | Build de producción |
+| `bun run lint` | ESLint |
+| `bun run typecheck` | Genera los tipos de rutas de Next y corre `tsc` |
+| `bun run test` | Tests, contra una base SQLite temporal (nunca la de `.env`) |
+| `bun run db:generate` | Genera una migración a partir de `server/db/schema.ts` |
+| `bun run db:migrate` | Aplica las migraciones pendientes |
+| `bun run db:studio` | Drizzle Studio |
+| `bun run icons` | Regenera los íconos de la PWA |
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+En Vercel, el build corre `db:migrate` antes de `next build` (ver `vercel.json`). Contra
+producción se usan siempre migraciones, nunca `drizzle-kit push`.
 
-## 📝 Development Guidelines
+CI (GitHub Actions) corre lint, typecheck y tests en cada PR y en cada push a `main`.
 
-- Follow TypeScript best practices and maintain strict type checking
-- Use functional components and hooks for React development
-- Implement proper error handling and logging
-- Write unit tests for business logic
-- Follow the mobile-first approach for responsive design
-- Use Server Components by default, only use 'use client' when necessary
-
-## 🔄 Available Scripts
-
-- `bun dev` - Start development server
-- `bun build` - Build production bundle
-- `bun start` - Start production server
-- `bun lint` - Run ESLint
-- `bun ios` - Open iOS Simulator
-
-## 🏗️ Project Structure
+## Estructura
 
 ```
+app/
+  (app)/          pantallas con sesión: plantas, detalle, editar, importar
+  (auth)/         login, registro, confirmar email, recuperar contraseña
+  api/export/     descarga del backup de la cuenta
+components/       UI (componentes de shadcn en components/ui)
+lib/              código compartido: validaciones, fechas, etiquetas, backup
+server/
+  auth/           sesión, JWT, tokens de email, límite de intentos
+  db/             esquema, conexión y migraciones
+  plants/         lecturas y escrituras, siempre filtradas por usuario
+  backup/         exportar e importar
+scripts/          importar un backup desde la terminal, generar íconos
+tests/            tests de bun
+proxy.ts          manda al login a quien no tiene sesión
+worklog/          roadmap, decisiones y bitácora del proyecto
+```
+
+## Convenciones
+
+La UI está en español rioplatense; lo que se guarda en la base, en inglés. Ver
+[`AGENTS.md`](AGENTS.md) y [`worklog/decisiones.md`](worklog/decisiones.md).

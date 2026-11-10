@@ -30,10 +30,9 @@ export async function proxy(request: NextRequest) {
  * - `manifest.webmanifest` y `sw.js` (PWA): el navegador los pide sin sesión,
  *   y si reciben el HTML del login en vez de JSON/JS, la app deja de ser
  *   instalable o el service worker no se registra, sin ningún error visible.
- * - `api/cron`: lo llama Vercel, que se autentica con `CRON_SECRET`.
  */
 export const config = {
   matcher: [
-    "/((?!login(?:/|$)|register(?:/|$)|verify-email(?:/|$)|forgot-password(?:/|$)|reset-password(?:/|$)|api/cron(?:/|$)|_next/static|_next/image|favicon\\.ico$|manifest\\.webmanifest$|sw\\.js$|.*\\.(?:ico|png|jpg|jpeg|gif|webp|svg|txt|woff2?)$).*)",
+    "/((?!login(?:/|$)|register(?:/|$)|verify-email(?:/|$)|forgot-password(?:/|$)|reset-password(?:/|$)|_next/static|_next/image|favicon\\.ico$|manifest\\.webmanifest$|sw\\.js$|.*\\.(?:ico|png|jpg|jpeg|gif|webp|svg|txt|woff2?)$).*)",
   ],
 }

@@ -17,6 +17,7 @@ Actualizado: 2026-11-10
 | — | UI en español | ✅ | [ui en español](2026-11-10-ui-en-espanol.md) |
 | — | Exportar e importar los datos de la cuenta | ✅ | [exportar e importar](2026-11-10-exportar-importar.md) |
 | 5 | PWA instalable: manifest e íconos (el SW va con las push) | ✅ (falta probar en un celular) | [pwa](2026-11-10-pwa-instalable.md) |
+| — | Limpieza antes de `main`: README, CI, `error.tsx`, `packageManager` | ✅ | [limpieza](2026-11-10-limpieza-antes-de-main.md) |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 
@@ -51,6 +52,9 @@ Después de mergear:
   rutinas importadas. La pantalla de rutinas va acá, porque sin rutinas no hay qué
   recordar. La tabla `push_subscriptions` ya existe, atada a `sessionVersion` como en
   futclub. En iOS, las push solo llegan con la PWA instalada (iOS 16.4 o superior).
+  La ruta del cron (`app/api/cron/...`) tiene que volver a quedar afuera del matcher de
+  `proxy.ts` y chequear `CRON_SECRET`, que hay que sumar otra vez a `.env.example` (se
+  sacaron las dos cosas mientras la ruta no existía).
 - **7 · Fotos.** Vercel Blob; la tabla `plant_photos` ya existe. La pestaña Photos se sacó
   en el 4a hasta tener la subida real. Ojo: `BLOB_READ_WRITE_TOKEN` (de 2025) está cargado
   en **todos** los entornos de Vercel. Antes de usarlo, separar Preview (otro store o
@@ -67,10 +71,4 @@ Después de mergear:
 
 ## Limpieza menor
 
-- `package.json` dice `"packageManager": "yarn@1.22.22"`, pero el proyecto usa bun. Hoy no
-  rompe nada (Vercel elige por el lockfile), pero contradice al resto.
-- README desactualizado: dice Next 14 y "local storage", y no menciona Turso, las
-  migraciones, `bun run test` ni las variables nuevas.
-- Sin CI. Un GitHub Action con lint, typecheck y `bun run test` en cada push.
 - La zona horaria es fija (Buenos Aires) y no hay forma de cambiarla.
-- Sin `error.tsx`: si Turso no responde, se ve la página de error genérica de Next.
