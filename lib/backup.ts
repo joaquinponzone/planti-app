@@ -11,7 +11,8 @@
  *   así que importar dos veces el mismo archivo en la misma cuenta no duplica.
  * - **legacy**: el Export de la Planti vieja, que volcaba `localStorage` entero
  *   (con claves ajenas, como el tema o `calendly-store`). Sus ids eran
- *   `Date.now()`: no sirven para detectar duplicados.
+ *   `Date.now()` y no sirven para detectar duplicados: el import reconoce
+ *   esas plantas por nombre, ubicación e historial (`server/backup/import.ts`).
  *
  * Todo lo que no se puede importar tal cual queda en `warnings`, para que se
  * vea antes de confirmar.
