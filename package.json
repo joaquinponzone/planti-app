@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "ios": "open -a Simulator",
+    "icons": "bun scripts/generate-pwa-icons.ts",
     "lint": "eslint .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun server/db/migrate.ts",
@@ -49,6 +50,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.3",
     "postcss": "^8",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },

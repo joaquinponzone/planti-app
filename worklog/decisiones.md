@@ -4,6 +4,28 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-011 · PWA instalable, sin service worker por ahora
+
+2026-11-10
+
+**Decisión:** manifest, íconos y metadata de iOS, como en futclub. Sin service worker
+hasta las push (paso 6), y cuando llegue, sin handler de `fetch`.
+
+**Por qué:** instalar y abrir sin barra del navegador no necesita SW. El único uso que
+tiene planeado es recibir push; cachear páginas con datos de la cuenta abre problemas
+(datos viejos, otra cuenta en el mismo dispositivo) que no resuelven nada pedido.
+
+**Reglas:**
+- Los íconos salen de `lib/plant-mark.ts` con `bun run icons` y se commitean. No se
+  dibujan aparte: la marca es una sola.
+- `statusBarStyle: "default"`: el contenido arranca debajo de la barra de estado y no
+  hace falta `viewport-fit: cover` ni compensar `safe-area-inset`. Si algún día hay una
+  barra inferior fija, revisar.
+- `manifest.webmanifest` y `sw.js` siguen exentos en el matcher de `proxy.ts`.
+
+**Descartado:** escalar el favicon de 96 px (borroso), `next-pwa` (sin mantenimiento, no
+soporta Next 16).
+
 ## D-010 · Exportar e importar los datos de la cuenta, desde la app
 
 2026-11-10

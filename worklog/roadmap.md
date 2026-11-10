@@ -16,7 +16,7 @@ Actualizado: 2026-11-10
 | 4b | Script de importación del backup | ✅ (falta correrlo en producción) | [import y tests](2026-11-10-import-backup-y-tests.md) |
 | — | UI en español | ✅ | [ui en español](2026-11-10-ui-en-espanol.md) |
 | — | Exportar e importar los datos de la cuenta | ✅ | [exportar e importar](2026-11-10-exportar-importar.md) |
-| 5 | PWA: manifest y service worker | pendiente | — |
+| 5 | PWA instalable: manifest e íconos (el SW va con las push) | ✅ (falta probar en un celular) | [pwa](2026-11-10-pwa-instalable.md) |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 
@@ -46,9 +46,7 @@ Después de mergear:
 
 ## Después
 
-- **5 · PWA.** `manifest.webmanifest` e íconos. Service worker sin handler de `fetch`
-  (solo push). El proxy ya deja pasar `manifest.webmanifest` y `sw.js`.
-- **6 · Push.** Hoy **no hay pantalla para crear rutinas** (tampoco la había antes:
+- **6 · Push.** Acá nace `public/sw.js` (sin handler de `fetch`, ver D-011) y el `badge-96.png` en `bun run icons`. Hoy **no hay pantalla para crear rutinas** (tampoco la había antes:
   `addSchedule` no se llamaba desde ningún lado), así que "Care needed" solo aparece con
   rutinas importadas. La pantalla de rutinas va acá, porque sin rutinas no hay qué
   recordar. La tabla `push_subscriptions` ya existe, atada a `sessionVersion` como en
