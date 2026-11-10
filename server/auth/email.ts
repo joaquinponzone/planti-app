@@ -88,11 +88,20 @@ let resend: Resend | null = null
  * probar en local con una clave real, pero en Vercel los usuarios no
  * recibirían nada. Por eso allá es obligatorio.
  */
-function fromAddress(): string {
-  const domain = process.env.RESEND_FROM_DOMAIN?.trim()
-  if (domain) return `Planti <noreply@${domain}>`
-  if (process.env.VERCEL) throw new Error("Falta RESEND_FROM_DOMAIN.")
-  return "Planti <onboarding@resend.dev>"
+export function fromAddress(): string {
+  const raw = process.env.RESEND_FROM_DOMAIN?.trim()
+  if (!raw) {
+    if (process.env.VERCEL) throw new Error("Falta RESEND_FROM_DOMAIN.")
+    return "Planti <onboarding@resend.dev>"
+  }
+
+  // Sólo el dominio, sin "noreply@" ni "https://". Se valida acá porque, si
+  // no, el error llega desde Resend ("Invalid `from` field") sin decir qué
+  // valor tenía la variable. Pasó en el primer deploy, con "noreply@planti.casa".
+  if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(raw)) {
+    throw new Error(`RESEND_FROM_DOMAIN tiene que ser sólo el dominio, como "planti.casa". Tiene: ${JSON.stringify(raw)}`)
+  }
+  return `Planti <noreply@${raw}>`
 }
 
 /**
