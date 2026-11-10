@@ -19,6 +19,7 @@ Actualizado: 2026-11-10
 | 5 | PWA instalable: manifest e íconos (el SW va con las push) | ✅ (falta probar en un celular) | [pwa](2026-11-10-pwa-instalable.md) |
 | — | Limpieza antes de `main`: README, CI, `error.tsx`, `packageManager` | ✅ | [limpieza](2026-11-10-limpieza-antes-de-main.md) |
 | — | Pasada por el navegador y formularios que no pierden lo escrito | ✅ | [pasada](2026-11-10-pasada-navegador.md) |
+| — | Filtro por estado de riego (Peligro, Aviso, Al día) | ✅ | [filtro](2026-11-10-filtro-por-estado.md) |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 
@@ -53,6 +54,7 @@ Después de mergear:
   rutinas importadas. La pantalla de rutinas va acá, porque sin rutinas no hay qué
   recordar. La tabla `push_subscriptions` ya existe, atada a `sessionVersion` como en
   futclub. En iOS, las push solo llegan con la PWA instalada (iOS 16.4 o superior).
+  El link del aviso puede abrir la lista filtrada: `/?status=danger,warning` (D-013).
   La ruta del cron (`app/api/cron/...`) tiene que volver a quedar afuera del matcher de
   `proxy.ts` y chequear `CRON_SECRET`, que hay que sumar otra vez a `.env.example` (se
   sacaron las dos cosas mientras la ruta no existía).

@@ -4,6 +4,30 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-013 · Filtro por estado de riego, en la URL y con los nombres de los umbrales
+
+2026-11-10
+
+**Decisión:** chips "Peligro", "Aviso" y "Al día" arriba de la lista, con la cantidad de
+cada uno. Se pueden prender varios; ninguno es "todas". El filtro vive en la URL
+(`?status=danger,warning`) y se cambia con `history.replaceState`, sin ir al servidor.
+
+**Por qué:** la pregunta al abrir la app es "¿qué riego hoy?". La lista ya ordena por
+urgencia dentro de cada ambiente, pero con muchas plantas las atrasadas quedan repartidas
+entre grupos. Los ambientes se mantienen: sirven para recorrer la casa regando.
+
+**Reglas:**
+- Los nombres son los de "Configurar alertas", no colores: el color solo no alcanza
+  (modo oscuro, daltonismo).
+- Una planta nunca regada no tiene estado (`getWateringStatus` devuelve `null`): se pinta
+  como al día pero ningún chip la cuenta. Sólo aparece sin filtro.
+- `replaceState` y no `pushState`: tocar chips no llena el historial. El filtro igual
+  sobrevive a recargar y a volver desde el detalle.
+- Pensado para el paso 6: el aviso push puede abrir `/?status=danger,warning`.
+
+**Descartado:** un filtro "verde / amarillo / rojo" con nombres de color, y guardar el
+filtro en `localStorage` (no se puede linkear y queda pegado sin que se vea por qué).
+
 ## D-012 · Formularios con `useFormAction`, no `useActionState` directo
 
 2026-11-10

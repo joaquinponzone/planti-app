@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Droplet, MoreVertical, NotebookText, Trash2, Pencil, ChevronsUpDown, AlarmClockCheck, ListChecks, Loader2 } from "lucide-react"
 
 import { addCareActivity, deletePlant } from "@/app/(app)/actions"
@@ -18,9 +19,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import {
+  getWateringStatus,
+  parseWateringStatuses,
+  WATERING_STATUSES,
+  type Thresholds,
+  type WateringStatus,
+} from "@/lib/care"
 import { formatDaysAgo } from "@/lib/dates"
 import { cn } from "@/lib/utils"
 import { Badge } from "./ui/badge"
+import { WateringFilter } from "./watering-filter"
 
 export type PlantCardData = {
   id: string
@@ -28,16 +37,6 @@ export type PlantCardData = {
   location: string | null
   needsCare: boolean
   daysSinceLastWatered: number | null
-}
-
-type Thresholds = { warningDays: number; dangerDays: number }
-type WateringStatus = "green" | "warning" | "danger"
-
-function getWateringStatus(days: number | null, thresholds: Thresholds): WateringStatus {
-  if (days === null) return "green" // nunca regada: sin alerta, como antes
-  if (days >= thresholds.dangerDays) return "danger"
-  if (days >= thresholds.warningDays) return "warning"
-  return "green"
 }
 
 function capitalize(text: string) {
@@ -50,7 +49,8 @@ function PlantCard({
   onDelete,
 }: {
   plant: PlantCardData
-  status: WateringStatus
+  /** `null`: nunca se regó. Se pinta como "ok". */
+  status: WateringStatus | null
   onDelete: (id: string) => void
 }) {
   const [watering, startWatering] = useTransition()
@@ -152,6 +152,7 @@ function PlantCard({
 export default function PlantList({ plants, thresholds }: { plants: PlantCardData[]; thresholds: Thresholds }) {
   const [plantToDelete, setPlantToDelete] = useState<string | null>(null)
   const [, startDeleting] = useTransition()
+  const searchParams = useSearchParams()
 
   if (plants.length === 0) {
     return (
@@ -174,18 +175,54 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
     )
   }
 
+  const withStatus = plants.map((plant) => ({ plant, status: getWateringStatus(plant.daysSinceLastWatered, thresholds) }))
+  const counts = Object.fromEntries(
+    WATERING_STATUSES.map((s) => [s, withStatus.filter((p) => p.status === s).length]),
+  ) as Record<WateringStatus, number>
+
+  // El filtro vive en la URL (`?status=danger,warning`): sobrevive a recargar y
+  // a volver desde el detalle de una planta.
+  const selected = parseWateringStatuses(searchParams.get("status"))
+  const visible = selected.length
+    ? withStatus.filter((p) => p.status !== null && selected.includes(p.status))
+    : withStatus
+
+  function toggleStatus(status: WateringStatus) {
+    const next = WATERING_STATUSES.filter((s) => (s === status ? !selected.includes(s) : selected.includes(s)))
+    // `replaceState` y no `router.replace`: filtrar no necesita ir al servidor.
+    // Next sincroniza `useSearchParams` con el historial nativo. Se arma a mano
+    // para que la coma no quede escapada (`%2C`) en la barra de direcciones.
+    window.history.replaceState(null, "", next.length ? `?status=${next.join(",")}` : window.location.pathname)
+  }
+
   // Agrupadas por ubicación; el servidor ya las manda ordenadas por último riego.
-  const groupedPlants = plants.reduce<Record<string, PlantCardData[]>>((acc, plant) => {
-    const key = plant.location || "Sin ubicación"
-    ;(acc[key] ??= []).push(plant)
+  const groupedPlants = visible.reduce<Record<string, typeof visible>>((acc, entry) => {
+    const key = entry.plant.location || "Sin ubicación"
+    ;(acc[key] ??= []).push(entry)
     return acc
   }, {})
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedPlants).map(([location, plantsInLocation]) => {
-        const statuses = plantsInLocation.map((p) => getWateringStatus(p.daysSinceLastWatered, thresholds))
-        const allPlantsGreen = statuses.every((s) => s === "green")
+      <WateringFilter selected={selected} counts={counts} onToggle={toggleStatus} />
+
+      {visible.length === 0 && (
+        <div className="border-4 border-black p-6 text-center bg-white dark:bg-neutral-800 neo-brutalist-shadow">
+          <p className="mb-4 font-bold">Ninguna planta con ese estado.</p>
+          <button
+            type="button"
+            onClick={() => window.history.replaceState(null, "", window.location.pathname)}
+            className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 border-2 border-black neo-brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
+          >
+            Ver todas
+          </button>
+        </div>
+      )}
+
+      {Object.entries(groupedPlants).map(([location, entries]) => {
+        const plantsInLocation = entries.map((e) => e.plant)
+        const statuses = entries.map((e) => e.status)
+        const allPlantsGreen = statuses.every((s) => s !== "warning" && s !== "danger")
         const inDanger = statuses.filter((s) => s === "danger").length
         const inWarning = statuses.filter((s) => s === "warning").length
 
