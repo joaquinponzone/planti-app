@@ -50,7 +50,8 @@ export function CareActivityDialog({
 
   return (
     <>
-      <div onClick={() => setIsOpen(true)}>{trigger}</div>
+      {/* h-full: en la grilla de cuidados, el botón tiene que ocupar toda la altura de la fila. */}
+      <div className="h-full" onClick={() => setIsOpen(true)}>{trigger}</div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px] bg-background border-4 neo-brutalist-shadow border-black">

@@ -45,8 +45,13 @@ const ICONS: Record<CareActivityType, React.ReactNode> = {
 
 const CARE_ACTIVITIES = CARE_ACTIVITY_TYPES.map((type) => ({ type, icon: ICONS[type], label: CARE_ACTIVITY_LABELS[type] }))
 
+// `h-auto` + `whitespace-normal` pisan la altura fija y el `nowrap` del Button
+// de shadcn: con las etiquetas en español ("Limpieza de hojas", "Cambio de
+// lugar") el texto se salía del botón en la grilla de 4 columnas. Ahora pasa
+// a una segunda línea. `h-full` (y no `h-auto`) para que todos los botones de
+// una fila midan lo mismo, también los que van dentro del envoltorio del diálogo.
 const activityButtonClass =
-  "w-full text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+  "w-full h-full min-h-12 md:min-h-10 py-2 whitespace-normal text-left leading-tight text-black border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
 
 type Activity = { id: string; type: CareActivityType; notes: string | null; when: string }
 
@@ -61,7 +66,7 @@ function QuickActivityButton({ plantId, activity }: { plantId: string; activity:
       className={activityButtonClass}
     >
       {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : activity.icon}
-      <span className="ml-2">{activity.label}</span>
+      <span className="ml-2 min-w-0">{activity.label}</span>
     </Button>
   )
 }
@@ -133,7 +138,7 @@ export function PlantDetailView({
               trigger={
                 <Button variant="outline" className={activityButtonClass}>
                   {activity.icon}
-                  <span className="ml-2">{activity.label}</span>
+                  <span className="ml-2 min-w-0">{activity.label}</span>
                 </Button>
               }
             />
