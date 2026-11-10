@@ -141,7 +141,7 @@ export function PlantDetailView({
         </div>
 
         <div className="border-4 border-black bg-card/20 neo-brutalist-shadow">
-          <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-secondary dark:text-neutral-900">Historial de cuidados</h2>
+          <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-primary text-primary-foreground">Historial de cuidados</h2>
 
           {activities.length === 0 ? (
             <div className="p-6 text-center text-muted-foreground"> - Todavía no hay cuidados registrados - </div>

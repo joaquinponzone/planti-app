@@ -155,7 +155,7 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
 
   if (plants.length === 0) {
     return (
-      <div className="border-4 border-black p-8 text-center bg-secondary neo-brutalist-shadow">
+      <div className="border-4 border-black p-8 text-center bg-white dark:bg-neutral-800 neo-brutalist-shadow">
         <h3 className="text-xl font-bold mb-4">¡Todavía no hay plantas!</h3>
         <p className="mb-4 text-muted-foreground">Agregá la primera para empezar a registrar sus cuidados.</p>
         <Link
@@ -164,6 +164,12 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
         >
           Agregar planta
         </Link>
+        <p className="mt-6 text-sm">
+          ¿Usabas Planti antes?{" "}
+          <Link href="/import" className="font-bold underline underline-offset-4">
+            Importá tu backup
+          </Link>
+        </p>
       </div>
     )
   }
