@@ -1,131 +1,117 @@
 "use client"
 
-import { useState, useEffect } from "react";
-import { usePlants, type PlantStatusThresholds } from "./plant-provider";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Settings } from "lucide-react";
+import { useState } from "react"
+import { useFormStatus } from "react-dom"
+import { Settings } from "lucide-react"
 
-// Interface for the local form state, allowing empty strings during input
-interface LocalThresholdsState {
-  warningDays: number | string;
-  dangerDays: number | string;
+import { updateThresholds, type ActionState } from "@/app/(app)/actions"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useFormAction } from "@/lib/use-form-action"
+
+function SaveButton() {
+  const { pending } = useFormStatus()
+  return (
+    <Button
+      type="submit"
+      size="sm"
+      disabled={pending}
+      className="bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-black"
+    >
+      {pending ? "Guardando…" : "Guardar"}
+    </Button>
+  )
 }
 
-export function ConfigPopover() {
-  const { plantStatusThresholds, updateThresholds } = usePlants();
-  // Use the local state interface
-  const [localThresholds, setLocalThresholds] = useState<LocalThresholdsState>({
-    warningDays: plantStatusThresholds.warningDays,
-    dangerDays: plantStatusThresholds.dangerDays,
-  });
-  const [isOpen, setIsOpen] = useState(false);
+type Thresholds = { warningDays: number; dangerDays: number }
 
-  // Use useEffect to update local state when context changes
-  useEffect(() => {
-    setLocalThresholds({
-        warningDays: plantStatusThresholds.warningDays,
-        dangerDays: plantStatusThresholds.dangerDays,
-    });
-  }, [plantStatusThresholds]);
-
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = event.target;
-    // Allow empty string or positive integer
-    const numberValue = value === "" ? "" : Math.max(0, parseInt(value, 10));
-    setLocalThresholds((prev) => ({
-      ...prev,
-      [name]: numberValue,
-    }));
-  }
-
-  function handleSave() {
-    // Convert local state (potentially strings) to numbers for saving
-    const warningValue = localThresholds.warningDays === "" ? 0 : Number(localThresholds.warningDays);
-    const dangerValue = localThresholds.dangerDays === "" ? 0 : Number(localThresholds.dangerDays);
-
-    // Basic validation
-    if (isNaN(warningValue) || isNaN(dangerValue)) {
-        console.error("Invalid threshold values entered.");
-        // Optionally, add user feedback here (e.g., toast notification)
-        return;
-    }
-
-    const thresholdsToSave: PlantStatusThresholds = {
-        warningDays: warningValue,
-        dangerDays: dangerValue,
-    };
-    updateThresholds(thresholdsToSave);
-    setIsOpen(false); // Close popover on save
-  }
-
-  function handleCancel() {
-    // Reset local state to context state on cancel
-    setLocalThresholds({
-        warningDays: plantStatusThresholds.warningDays,
-        dangerDays: plantStatusThresholds.dangerDays,
-    });
-    setIsOpen(false);
-  }
-
-  function handleOpenChange(open: boolean) {
-    setIsOpen(open);
-    // If popover is closing without saving, reset local state
-    if (!open) {
-        handleCancel();
-    }
-  }
+export function ConfigPopover({ warningDays, dangerDays }: Thresholds) {
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Popover open={isOpen} onOpenChange={handleOpenChange}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+        <Button
+          variant="outline"
+          size="icon"
+          className="border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
+        >
           <Settings className="h-5 w-5" />
-          <span className="sr-only">Configure Thresholds</span>
+          <span className="sr-only">Configurar alertas</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60 border-2 border-black bg-background neo-brutalist-shadow">
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <h4 className="font-medium leading-none">Alert Thresholds</h4>
-            <p className="text-sm text-muted-foreground">
-              Set days since last watered for alerts.
-            </p>
-          </div>
-          <div className="grid gap-2">
-            <div className="grid grid-cols-3 items-center gap-4">
-              <Label htmlFor="warningDays">Warning</Label>
-              <Input
-                id="warningDays"
-                name="warningDays"
-                type="number"
-                min="0"
-                value={localThresholds.warningDays}
-                onChange={handleInputChange}
-                className="col-span-2 h-8 border-2 border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
-              />
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4">
-              <Label htmlFor="dangerDays">Danger</Label>
-              <Input
-                id="dangerDays"
-                name="dangerDays"
-                type="number"
-                min="0"
-                value={localThresholds.dangerDays}
-                onChange={handleInputChange}
-                className="col-span-2 h-8 border-2 border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-             <Button variant="outline" size="sm" onClick={handleCancel} className="border-2 border-black">Cancel</Button>
-            <Button size="sm" onClick={handleSave} className="bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-black">Save</Button>
-          </div>
-        </div>
+        {/*
+          `PopoverContent` desmonta lo de adentro al cerrarse, así que el
+          formulario (y su estado) arranca de cero cada vez que se abre: cancelar
+          no deja ni valores a medio editar ni el error para la próxima vez.
+        */}
+        <ThresholdsForm warningDays={warningDays} dangerDays={dangerDays} onDone={() => setIsOpen(false)} />
       </PopoverContent>
     </Popover>
-  );
-} 
+  )
+}
+
+function ThresholdsForm({ warningDays, dangerDays, onDone }: Thresholds & { onDone: () => void }) {
+  // Cierra el popover sólo si se guardó; con error queda abierto mostrándolo,
+  // con los valores que se mandaron (ver `useFormAction`).
+  const [state, formAction, values] = useFormAction<ActionState>(
+    async (prev, formData) => {
+      const result = await updateThresholds(prev, formData)
+      if (!result.error) onDone()
+      return result
+    },
+    {},
+    ["warningDays", "dangerDays"],
+  )
+
+  return (
+    <form action={formAction} className="grid gap-4">
+      <div className="space-y-2">
+        <h4 className="font-medium leading-none">Alertas de riego</h4>
+        <p className="text-sm text-muted-foreground">Días sin regar hasta que la tarjeta cambia de color.</p>
+      </div>
+      {state.error && (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {state.error}
+        </p>
+      )}
+      <div className="grid gap-2">
+        <div className="grid grid-cols-3 items-center gap-4">
+          <Label htmlFor="warningDays">Aviso</Label>
+          <Input
+            id="warningDays"
+            name="warningDays"
+            type="number"
+            min={1}
+            max={365}
+            required
+            defaultValue={values.warningDays ?? warningDays}
+            className="col-span-2 h-8 border-2 border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
+          />
+        </div>
+        <div className="grid grid-cols-3 items-center gap-4">
+          <Label htmlFor="dangerDays">Peligro</Label>
+          <Input
+            id="dangerDays"
+            name="dangerDays"
+            type="number"
+            min={1}
+            max={365}
+            required
+            defaultValue={values.dangerDays ?? dangerDays}
+            className="col-span-2 h-8 border-2 border-black focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-primary"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={onDone} className="border-2 border-black">
+          Cancelar
+        </Button>
+        <SaveButton />
+      </div>
+    </form>
+  )
+}
