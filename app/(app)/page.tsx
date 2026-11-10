@@ -1,7 +1,9 @@
+import { cookies } from "next/headers"
 import Link from "next/link"
 import { PlusCircle } from "lucide-react"
 
 import PlantList, { type PlantCardData } from "@/components/plant-list"
+import { COLLAPSED_LOCATIONS_COOKIE, parseCollapsedLocations } from "@/lib/collapsed-locations"
 import { requireUser } from "@/lib/dal"
 import { daysAgo } from "@/lib/dates"
 import { listPlants } from "@/server/plants/queries"
@@ -20,6 +22,7 @@ export default async function Home() {
     needsCare: p.needsCare,
     daysSinceLastWatered: p.lastWateredAt ? daysAgo(p.lastWateredAt, now, user.timezone) : null,
   }))
+  const collapsedLocations = parseCollapsedLocations((await cookies()).get(COLLAPSED_LOCATIONS_COOKIE)?.value)
 
   return (
     <main className="container mx-auto p-4 md:p-8 pt-0">
@@ -38,7 +41,11 @@ export default async function Home() {
           </div>
         </header>
 
-        <PlantList plants={plants} thresholds={{ warningDays: user.warningDays, dangerDays: user.dangerDays }} />
+        <PlantList
+          plants={plants}
+          thresholds={{ warningDays: user.warningDays, dangerDays: user.dangerDays }}
+          initialCollapsed={collapsedLocations}
+        />
       </div>
     </main>
   )

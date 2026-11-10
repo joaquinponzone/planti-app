@@ -3,7 +3,19 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { Droplet, MoreVertical, NotebookText, Trash2, Pencil, ChevronsUpDown, AlarmClockCheck, ListChecks, Loader2 } from "lucide-react"
+import {
+  AlarmClockCheck,
+  ChevronDown,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  Droplet,
+  ListChecks,
+  Loader2,
+  MoreVertical,
+  NotebookText,
+  Pencil,
+  Trash2,
+} from "lucide-react"
 
 import { addCareActivity, deletePlant } from "@/app/(app)/actions"
 import { Button } from "@/components/ui/button"
@@ -26,9 +38,10 @@ import {
   type Thresholds,
   type WateringStatus,
 } from "@/lib/care"
+import { saveCollapsedLocations } from "@/lib/collapsed-locations"
 import { formatDaysAgo } from "@/lib/dates"
 import { cn } from "@/lib/utils"
-import { Badge } from "./ui/badge"
+import { badgeVariants } from "./ui/badge"
 import { WateringFilter } from "./watering-filter"
 
 export type PlantCardData = {
@@ -37,6 +50,12 @@ export type PlantCardData = {
   location: string | null
   needsCare: boolean
   daysSinceLastWatered: number | null
+}
+
+const NO_LOCATION = "Sin ubicación"
+
+function locationOf(plant: PlantCardData) {
+  return plant.location || NO_LOCATION
 }
 
 function capitalize(text: string) {
@@ -149,8 +168,18 @@ function PlantCard({
   )
 }
 
-export default function PlantList({ plants, thresholds }: { plants: PlantCardData[]; thresholds: Thresholds }) {
+export default function PlantList({
+  plants,
+  thresholds,
+  initialCollapsed,
+}: {
+  plants: PlantCardData[]
+  thresholds: Thresholds
+  /** Ambientes plegados según la cookie (ver `lib/collapsed-locations.ts`). */
+  initialCollapsed: string[]
+}) {
   const [plantToDelete, setPlantToDelete] = useState<string | null>(null)
+  const [collapsed, setCollapsed] = useState(() => new Set(initialCollapsed))
   const [, startDeleting] = useTransition()
   const searchParams = useSearchParams()
 
@@ -197,14 +226,58 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
 
   // Agrupadas por ubicación; el servidor ya las manda ordenadas por último riego.
   const groupedPlants = visible.reduce<Record<string, typeof visible>>((acc, entry) => {
-    const key = entry.plant.location || "Sin ubicación"
-    ;(acc[key] ??= []).push(entry)
+    ;(acc[locationOf(entry.plant)] ??= []).push(entry)
     return acc
   }, {})
+  const visibleLocations = Object.keys(groupedPlants)
+  const allCollapsed = visibleLocations.length > 0 && visibleLocations.every((l) => collapsed.has(l))
+
+  function updateCollapsed(next: Set<string>) {
+    // Sólo se guardan ambientes que existen: uno renombrado o vacío no queda
+    // para siempre en la cookie.
+    const existing = new Set(plants.map(locationOf))
+    const pruned = new Set([...next].filter((l) => existing.has(l)))
+    setCollapsed(pruned)
+    saveCollapsedLocations(pruned)
+  }
+
+  function setLocationCollapsed(location: string, value: boolean) {
+    const next = new Set(collapsed)
+    if (value) next.add(location)
+    else next.delete(location)
+    updateCollapsed(next)
+  }
+
+  // Actúa sobre los ambientes a la vista: con un filtro puesto, "Desplegar
+  // todos" abre los que se ven, no los que el filtro escondió.
+  function toggleAll() {
+    const next = new Set(collapsed)
+    for (const l of visibleLocations) {
+      if (allCollapsed) next.delete(l)
+      else next.add(l)
+    }
+    updateCollapsed(next)
+  }
 
   return (
     <div className="space-y-6">
-      <WateringFilter selected={selected} counts={counts} onToggle={toggleStatus} />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <WateringFilter selected={selected} counts={counts} onToggle={toggleStatus} />
+        {visibleLocations.length > 1 && (
+          <button
+            type="button"
+            onClick={toggleAll}
+            className="flex w-fit items-center gap-1.5 text-sm font-bold underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black dark:focus-visible:outline-white"
+          >
+            {allCollapsed ? (
+              <ChevronsUpDown aria-hidden className="size-4" />
+            ) : (
+              <ChevronsDownUp aria-hidden className="size-4" />
+            )}
+            {allCollapsed ? "Desplegar todos" : "Plegar todos"}
+          </button>
+        )}
+      </div>
 
       {visible.length === 0 && (
         <div className="border-4 border-black p-6 text-center bg-white dark:bg-neutral-800 neo-brutalist-shadow">
@@ -220,57 +293,73 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
       )}
 
       {Object.entries(groupedPlants).map(([location, entries]) => {
-        const plantsInLocation = entries.map((e) => e.plant)
         const statuses = entries.map((e) => e.status)
-        const allPlantsGreen = statuses.every((s) => s !== "warning" && s !== "danger")
         const inDanger = statuses.filter((s) => s === "danger").length
         const inWarning = statuses.filter((s) => s === "warning").length
-
-        const plantGrid = (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {plantsInLocation.map((plant, i) => (
-              <PlantCard key={plant.id} plant={plant} status={statuses[i]} onDelete={setPlantToDelete} />
-            ))}
-          </div>
-        )
+        const open = !collapsed.has(location)
 
         return (
-          <div key={location} className="space-y-3">
-            {allPlantsGreen ? (
-              <Collapsible defaultOpen={true}>
-                <CollapsibleTrigger asChild>
-                  <button className="flex items-center gap-2 text-lg font-semibold capitalize hover:text-muted-foreground dark:hover:text-accent transition-colors border-b-4 border-black pb-1 w-full justify-between">
-                    <span className="flex items-center gap-2">
-                      {location}
-                      <ListChecks className="size-5 text-black p-0" />
+          <Collapsible key={location} open={open} onOpenChange={(next) => setLocationCollapsed(location, !next)}>
+            {/*
+              El h2 envuelve al botón (y no al revés): un botón no puede tener
+              un título adentro, y así el lector de pantalla lo anuncia como
+              título y como botón desplegable.
+            */}
+            <h2>
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className="group flex w-full items-center gap-2 border-b-4 border-black pb-1 text-left text-lg font-semibold transition-colors hover:text-muted-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black dark:hover:text-accent dark:focus-visible:outline-white"
+                >
+                  <ChevronDown
+                    aria-hidden
+                    className="size-5 shrink-0 transition-transform duration-200 group-data-[state=closed]:-rotate-90 motion-reduce:transition-none"
+                  />
+                  <span className="min-w-0 truncate">{capitalize(location)}</span>
+                  {/* Plegado oculta las tarjetas, no el aviso: los contadores quedan a la vista. */}
+                  {inDanger + inWarning === 0 ? (
+                    <ListChecks aria-label="Todas al día" className="size-5 shrink-0" />
+                  ) : (
+                    <span className="flex shrink-0 items-center gap-2">
+                      <AlarmClockCheck aria-hidden className="size-5" />
+                      {/* `span` y no `Badge`, que es un `div`: no puede ir dentro de un botón. */}
+                      {inDanger > 0 && (
+                        <span
+                          className={cn(badgeVariants({ variant: "destructive" }), "border-2 border-black")}
+                          aria-label={`${inDanger} en peligro`}
+                        >
+                          {inDanger}
+                        </span>
+                      )}
+                      {inWarning > 0 && (
+                        <span
+                          className={cn(badgeVariants(), "bg-yellow-200/50 hover:bg-yellow-200/70 border-2 border-black")}
+                          aria-label={`${inWarning} en aviso`}
+                        >
+                          {inWarning}
+                        </span>
+                      )}
                     </span>
-                    <span className="flex items-center gap-2">
-                      <ChevronsUpDown className="size-5 text-black p-0" />
-                    </span>
-                  </button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="mt-3">{plantGrid}</CollapsibleContent>
-              </Collapsible>
-            ) : (
-              <>
-                <h2 className="flex items-center gap-2 text-lg font-semibold capitalize border-b-4 border-black w-fit pb-1">
-                  {location}
-                  <span className="flex items-center gap-2">
-                    <AlarmClockCheck className="size-5" />
-                    {inDanger > 0 ? (
-                      <Badge variant="destructive" className="border-2 border-black">
-                        {inDanger}
-                      </Badge>
-                    ) : null}
-                    {inWarning > 0 ? (
-                      <Badge className="bg-yellow-200/50 hover:bg-yellow-200/70 border-2 border-black">{inWarning}</Badge>
-                    ) : null}
+                  )}
+                  <span className="ml-auto shrink-0 text-sm font-normal text-muted-foreground">
+                    {entries.length === 1 ? "1 planta" : `${entries.length} plantas`}
                   </span>
-                </h2>
-                {plantGrid}
-              </>
-            )}
-          </div>
+                </button>
+              </CollapsibleTrigger>
+            </h2>
+            {/*
+              `overflow-hidden` es lo que deja animar la altura, pero recortaría
+              la sombra de 4 px de las tarjetas: el margen negativo con padding le
+              da lugar sin mover nada.
+            */}
+            <CollapsibleContent className="-mb-2 -mr-2 overflow-hidden pb-2 pr-2 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down motion-reduce:animate-none">
+              <div className="grid grid-cols-1 gap-4 pt-3 md:grid-cols-2">
+                {entries.map(({ plant, status }) => (
+                  <PlantCard key={plant.id} plant={plant} status={status} onDelete={setPlantToDelete} />
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )
       })}
 

@@ -20,6 +20,7 @@ Actualizado: 2026-11-10
 | — | Limpieza antes de `main`: README, CI, `error.tsx`, `packageManager` | ✅ | [limpieza](2026-11-10-limpieza-antes-de-main.md) |
 | — | Pasada por el navegador y formularios que no pierden lo escrito | ✅ | [pasada](2026-11-10-pasada-navegador.md) |
 | — | Filtro por estado de riego (Peligro, Aviso, Al día) | ✅ | [filtro](2026-11-10-filtro-por-estado.md) |
+| — | Ambientes plegables y "Plegar todos" | ✅ | [plegar](2026-11-10-ambientes-plegables.md) |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 
@@ -74,8 +75,6 @@ Después de mergear:
 
 ## Limpieza menor
 
-- Los grupos de ubicación usan `capitalize`, que pone en mayúscula cada palabra: "Sin
-  ubicación" se ve "Sin Ubicación".
 - En dev, error de hidratación en el botón "Cuenta" (el HTML del servidor no lo trae). En
   el build de producción sí lo trae; no se investigó la causa.
 - La zona horaria es fija (Buenos Aires) y no hay forma de cambiarla.

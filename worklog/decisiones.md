@@ -4,6 +4,30 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-014 · Ambientes plegables, recordados en una cookie del dispositivo
+
+2026-11-10
+
+**Decisión:** todos los ambientes de la lista se pliegan con el mismo encabezado (flecha,
+nombre, contadores de estado y cantidad de plantas), más un "Plegar todos / Desplegar
+todos". Lo plegado se guarda en la cookie `planti_collapsed` y el servidor la lee.
+
+**Por qué:** para concentrarse en un ambiente a la vez. Antes sólo se plegaban los
+ambientes "todos al día", justo los que menos estorban.
+
+**Reglas:**
+- Plegado oculta las tarjetas, no el aviso: los contadores rojo y amarillo siguen en el
+  encabezado.
+- "Plegar todos" actúa sobre los ambientes a la vista: con un filtro puesto, no toca los
+  que el filtro escondió.
+- Cookie y no `localStorage`: con `localStorage` la página llegaría abierta y se cerraría
+  después de cargar. Y no en la base: es el armado de cada pantalla, no un dato de la
+  cuenta.
+- La cookie sólo guarda ambientes que existen; uno renombrado se descarta al guardar.
+
+**Descartado:** un botón "Solo este" por ambiente (más directo, pero carga cada
+encabezado) y un acordeón que abre uno solo a la vez (obliga a cerrar para comparar).
+
 ## D-013 · Filtro por estado de riego, en la URL y con los nombres de los umbrales
 
 2026-11-10
