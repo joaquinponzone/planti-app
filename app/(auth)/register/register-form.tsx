@@ -1,22 +1,22 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState } from "react"
 import { Leaf } from "lucide-react"
 
 import { AuthCard, Field, FormMessage, SubmitButton } from "@/components/auth/auth-form"
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth-validation"
+import { useFormAction } from "@/lib/use-form-action"
 
 import { register, type FormState } from "../actions"
 
 export function RegisterForm() {
-  const [state, action] = useActionState<FormState, FormData>(register, {})
+  const [state, action, values] = useFormAction<FormState>(register, {}, ["email"])
 
   return (
     <AuthCard title="Creá tu cuenta" subtitle="Tus plantas y su historial, en el celu y en la compu.">
       <form action={action} className="space-y-6">
         <FormMessage error={state.error} />
-        <Field label="Email" name="email" type="email" autoComplete="email" required />
+        <Field label="Email" name="email" type="email" autoComplete="email" defaultValue={values.email} required />
         <Field
           label="Contraseña"
           name="password"

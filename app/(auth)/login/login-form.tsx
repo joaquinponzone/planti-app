@@ -5,11 +5,12 @@ import { useActionState } from "react"
 import { LogIn } from "lucide-react"
 
 import { AuthCard, Field, FormMessage, SubmitButton } from "@/components/auth/auth-form"
+import { useFormAction } from "@/lib/use-form-action"
 
 import { login, resendVerification, type FormState } from "../actions"
 
 export function LoginForm({ from, justReset }: { from: string; justReset: boolean }) {
-  const [state, action] = useActionState<FormState, FormData>(login, {})
+  const [state, action, values] = useFormAction<FormState>(login, {}, ["email"])
   const [resendState, resendAction] = useActionState<FormState, FormData>(resendVerification, {})
 
   return (
@@ -18,7 +19,7 @@ export function LoginForm({ from, justReset }: { from: string; justReset: boolea
         <input type="hidden" name="from" value={from} />
         {justReset && !state.error && <FormMessage message="Cambiaste tu contraseña. Entrá con la nueva." />}
         <FormMessage error={state.error} />
-        <Field label="Email" name="email" type="email" autoComplete="email" required />
+        <Field label="Email" name="email" type="email" autoComplete="email" defaultValue={values.email} required />
         <Field label="Contraseña" name="password" type="password" autoComplete="current-password" required />
         <SubmitButton>
           <LogIn className="mr-2 h-6 w-6" />

@@ -4,6 +4,27 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-012 · Formularios con `useFormAction`, no `useActionState` directo
+
+2026-11-10
+
+**Decisión:** todo `<form action={...}>` con campos que se tipean usa `useFormAction`
+(`lib/use-form-action.ts`). Recuerda lo enviado y los campos lo usan de `defaultValue`.
+
+**Por qué:** React 19 resetea el formulario cuando termina la acción, también si el
+servidor devolvió un error. Con `useActionState` solo, el mensaje de error aparecía con
+los campos vueltos a lo guardado (umbrales, editar planta) o vacíos (el email del login).
+Se vio en la pasada por el navegador; ningún test lo cubría.
+
+**Reglas:**
+- `keep` lista los campos a recordar. Nunca una contraseña: quedaría escrita en el DOM.
+- Los campos siguen sin controlar (`defaultValue`, no `value` + `onChange`): el reset usa
+  el `defaultValue` del último render, que ya trae lo enviado.
+
+**Descartado:** devolver los valores desde la Server Action (los manda ida y vuelta por la
+red sin necesidad) y pasar los formularios a controlados (un `useState` por campo en
+cada formulario).
+
 ## D-011 · PWA instalable, sin service worker por ahora
 
 2026-11-10

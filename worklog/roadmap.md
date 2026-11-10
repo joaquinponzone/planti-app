@@ -18,6 +18,7 @@ Actualizado: 2026-11-10
 | — | Exportar e importar los datos de la cuenta | ✅ | [exportar e importar](2026-11-10-exportar-importar.md) |
 | 5 | PWA instalable: manifest e íconos (el SW va con las push) | ✅ (falta probar en un celular) | [pwa](2026-11-10-pwa-instalable.md) |
 | — | Limpieza antes de `main`: README, CI, `error.tsx`, `packageManager` | ✅ | [limpieza](2026-11-10-limpieza-antes-de-main.md) |
+| — | Pasada por el navegador y formularios que no pierden lo escrito | ✅ | [pasada](2026-11-10-pasada-navegador.md) |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 
@@ -33,8 +34,8 @@ Antes de mergear a `main`:
 3. **Vercel, scope Development:** vacío. `vercel env pull` lo bajaría a tu `.env`.
 4. **Resend:** dominio verificado. Sin eso solo te llegan los emails a vos y nadie más puede
    confirmar su cuenta. Salida de emergencia: `update users set email_verified_at = …`.
-5. **Pasada por el navegador** con `bun dev`: regar, cuidados rápidos, diálogo con notas,
-   borrar, umbrales, logout. Nada de eso se probó con clics.
+5. ~~Pasada por el navegador~~ hecha en local ([entrada](2026-11-10-pasada-navegador.md)).
+   Falta la misma pasada en el deploy de producción, con Turso y Resend reales.
 6. Confirmar que las funciones de Vercel corren en `iad1`, la misma zona que Turso
    (`aws-us-east-1`).
 
@@ -71,4 +72,8 @@ Después de mergear:
 
 ## Limpieza menor
 
+- Los grupos de ubicación usan `capitalize`, que pone en mayúscula cada palabra: "Sin
+  ubicación" se ve "Sin Ubicación".
+- En dev, error de hidratación en el botón "Cuenta" (el HTML del servidor no lo trae). En
+  el build de producción sí lo trae; no se investigó la causa.
 - La zona horaria es fija (Buenos Aires) y no hay forma de cambiarla.

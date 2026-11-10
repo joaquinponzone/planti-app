@@ -1,6 +1,5 @@
 "use client"
 
-import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { useRouter } from "next/navigation"
 import { Leaf, Loader2, Save } from "lucide-react"
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useFormAction } from "@/lib/use-form-action"
 
 const inputClass =
   "border-2 border-black bg-card/30 dark:bg-card/20 h-12 px-4 neo-brutalist-shadow focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-black"
@@ -47,7 +47,7 @@ export function PlantForm({
   mode: "create" | "edit"
 }) {
   const router = useRouter()
-  const [state, formAction] = useActionState(action, {})
+  const [state, formAction, values] = useFormAction(action, {}, ["name", "scientificName", "location", "notes"])
 
   return (
     <form action={formAction} className="space-y-6">
@@ -60,7 +60,7 @@ export function PlantForm({
         <Input
           id="name"
           name="name"
-          defaultValue={initial?.name}
+          defaultValue={values.name ?? initial?.name}
           required
           maxLength={100}
           className={inputClass}
@@ -78,7 +78,7 @@ export function PlantForm({
         <Input
           id="scientificName"
           name="scientificName"
-          defaultValue={initial?.scientificName ?? ""}
+          defaultValue={values.scientificName ?? initial?.scientificName ?? ""}
           maxLength={100}
           className={inputClass}
           placeholder="Monstera deliciosa"
@@ -92,7 +92,7 @@ export function PlantForm({
         <Input
           id="location"
           name="location"
-          defaultValue={initial?.location ?? ""}
+          defaultValue={values.location ?? initial?.location ?? ""}
           maxLength={100}
           className={inputClass}
           placeholder="Living"
@@ -107,7 +107,7 @@ export function PlantForm({
         <Textarea
           id="notes"
           name="notes"
-          defaultValue={initial?.notes ?? ""}
+          defaultValue={values.notes ?? initial?.notes ?? ""}
           maxLength={2000}
           className={`${inputClass} min-h-[100px] text-lg`}
         />
