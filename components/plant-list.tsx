@@ -75,7 +75,7 @@ function PlantCard({
           <div className="flex flex-col gap-1">
             {plant.daysSinceLastWatered !== null && (
               <p className="text-sm">
-                Last watered:{" "}
+                Último riego:{" "}
                 <span className="text-black dark:text-white font-bold font-mono">
                   {capitalize(formatDaysAgo(plant.daysSinceLastWatered))}
                 </span>
@@ -98,7 +98,7 @@ function PlantCard({
             size="icon"
           >
             {watering ? <Loader2 className="h-5 w-5 animate-spin" /> : <Droplet className="h-5 w-5" />}
-            <span className="sr-only">Water</span>
+            <span className="sr-only">Regar</span>
           </Button>
 
           <Link href={`/plant/${plant.id}`}>
@@ -108,7 +108,7 @@ function PlantCard({
               className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
             >
               <NotebookText className="h-5 w-5" />
-              <span className="sr-only">Details</span>
+              <span className="sr-only">Detalle</span>
             </Button>
           </Link>
 
@@ -120,14 +120,14 @@ function PlantCard({
                 className="border-2 border-black hover:bg-primary hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
               >
                 <MoreVertical className="h-5 w-5" />
-                <span className="sr-only">More</span>
+                <span className="sr-only">Más opciones</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-background border-2 border-black">
               <DropdownMenuItem asChild className="cursor-pointer hover:bg-primary hover:text-primary-foreground">
                 <Link href={`/plant/${plant.id}/edit`}>
                   <Pencil className="h-4 w-4 mr-2" />
-                  Edit plant
+                  Editar planta
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -135,7 +135,7 @@ function PlantCard({
                 onSelect={() => onDelete(plant.id)}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                Borrar
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -143,7 +143,7 @@ function PlantCard({
       </div>
 
       {plant.needsCare && (
-        <div className="bg-destructive/20 p-3 text-sm font-medium border-t-2 border-destructive">Care needed</div>
+        <div className="bg-destructive/20 p-3 text-sm font-medium border-t-2 border-destructive">Necesita cuidados</div>
       )}
     </div>
   )
@@ -156,13 +156,13 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
   if (plants.length === 0) {
     return (
       <div className="border-4 border-black p-8 text-center bg-secondary neo-brutalist-shadow">
-        <h3 className="text-xl font-bold mb-4">No plants yet!</h3>
-        <p className="mb-4 text-muted-foreground">Add your first plant to start tracking.</p>
+        <h3 className="text-xl font-bold mb-4">¡Todavía no hay plantas!</h3>
+        <p className="mb-4 text-muted-foreground">Agregá la primera para empezar a registrar sus cuidados.</p>
         <Link
           href="/add-plant"
           className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-4 border-2 border-black neo-brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
         >
-          Add Plant
+          Agregar planta
         </Link>
       </div>
     )
@@ -170,7 +170,7 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
 
   // Agrupadas por ubicación; el servidor ya las manda ordenadas por último riego.
   const groupedPlants = plants.reduce<Record<string, PlantCardData[]>>((acc, plant) => {
-    const key = plant.location || "Unassigned"
+    const key = plant.location || "Sin ubicación"
     ;(acc[key] ??= []).push(plant)
     return acc
   }, {})
@@ -234,13 +234,13 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
       <AlertDialog open={!!plantToDelete} onOpenChange={() => setPlantToDelete(null)}>
         <AlertDialogContent className="border-2 border-black neo-brutalist-shadow">
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>¿Borrar la planta?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your plant and all its data.
+              No se puede deshacer: se borran la planta y todo su historial.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-2 border-black">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-2 border-black">Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 border-2 border-black"
               onClick={() => {
@@ -249,7 +249,7 @@ export default function PlantList({ plants, thresholds }: { plants: PlantCardDat
                 setPlantToDelete(null)
               }}
             >
-              Delete
+              Borrar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

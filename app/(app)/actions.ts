@@ -41,7 +41,7 @@ export async function updatePlant(plantId: string, _prev: ActionState, formData:
   const parsed = plantFields(formData)
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  if (!(await plants.updatePlant(user.id, plantId, parsed.data))) return { error: "Plant not found" }
+  if (!(await plants.updatePlant(user.id, plantId, parsed.data))) return { error: "No encontramos esa planta" }
   revalidatePath("/")
   revalidatePath(`/plant/${plantId}`)
   redirect(`/plant/${plantId}`)
@@ -59,7 +59,7 @@ export async function addCareActivity(input: { plantId: string; type: string; no
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
   const { plantId, type, notes } = parsed.data
-  if (!(await plants.addCareActivity(user.id, plantId, type, notes))) return { error: "Plant not found" }
+  if (!(await plants.addCareActivity(user.id, plantId, type, notes))) return { error: "No encontramos esa planta" }
   revalidatePath("/")
   revalidatePath(`/plant/${plantId}`)
   return {}

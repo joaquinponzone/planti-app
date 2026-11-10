@@ -4,6 +4,22 @@ La más nueva arriba. Una decisión revertida no se borra: se marca **reemplazad
 
 ---
 
+## D-009 · UI solo en español, sin framework de i18n
+
+2026-11-10
+
+**Decisión:** la pantalla, los emails y los mensajes de error están en español rioplatense
+(voseo). Se adopta la regla de futclub: el dominio habla inglés, la pantalla habla español;
+los valores del dominio se traducen una sola vez en `CARE_ACTIVITY_LABELS` (`lib/care.ts`).
+
+**Por qué:** las dos usuarias hablan español. Un framework de i18n (`next-intl` o similar)
+convierte cada texto en una clave de catálogo, exige detectar el idioma y escribir cada
+texto y cada email N veces para siempre. Si aparece un público en otro idioma, pasar textos
+inline a un catálogo es mecánico y acotado.
+
+**Descartado:** varios idiomas con catálogo; quedarse en inglés (la app venía en inglés,
+pero sus usuarias no).
+
 ## D-008 · La importación del backup es un script, no una función de la app
 
 2026-11-10

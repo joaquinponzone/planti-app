@@ -6,7 +6,7 @@
  * testea sola. Todo lo que no se puede importar tal cual queda anotado en
  * `warnings`, para que se vea en el `--dry-run` antes de escribir nada.
  */
-import { z } from "zod"
+import { z } from "../lib/zod"
 
 import {
   CARE_ACTIVITY_TYPES,

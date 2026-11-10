@@ -9,8 +9,8 @@ import { Footer } from "@/components/footer"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Planti - Keep your green friends alive!",
-  description: "Planti is a simple app to help you take care of your plants. It's a place to store information about your plants, their care, and their growth.",
+  title: "Planti · ¡Mantené vivas a tus plantas!",
+  description: "Planti es una app simple para cuidar tus plantas: anotá cuándo las regaste, fertilizaste o trasplantaste, y recibí un aviso cuando te necesiten.",
 }
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light">
           <div className="min-h-screen bg-background text-foreground">

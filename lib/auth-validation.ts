@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "./zod"
 
 /** `Juan@X.com` y `juan@x.com` son la misma cuenta: se guarda y se busca normalizado. */
 export function normalizeEmail(email: string): string {
@@ -26,18 +26,18 @@ export const PASSWORD_MIN_LENGTH = 8
  */
 export const PASSWORD_MAX_BYTES = 72
 
-const email = z.email("That email doesn't look right").transform(normalizeEmail)
+const email = z.email("Ese email no parece válido").transform(normalizeEmail)
 
 const newPassword = z
   .string()
-  .min(PASSWORD_MIN_LENGTH, `Use at least ${PASSWORD_MIN_LENGTH} characters`)
-  .refine((v) => new TextEncoder().encode(v).length <= PASSWORD_MAX_BYTES, "That password is too long")
+  .min(PASSWORD_MIN_LENGTH, `Usá al menos ${PASSWORD_MIN_LENGTH} caracteres`)
+  .refine((v) => new TextEncoder().encode(v).length <= PASSWORD_MAX_BYTES, "Esa contraseña es demasiado larga")
 
 export const LoginSchema = z.object({
   email,
   // Al loguearse no se valida el formato: una regla nueva no puede dejar
   // afuera a quien eligió su contraseña cuando la regla no existía.
-  password: z.string().min(1, "Enter your password"),
+  password: z.string().min(1, "Escribí tu contraseña"),
 })
 
 export const RegisterSchema = z.object({ email, password: newPassword })
@@ -45,10 +45,10 @@ export const RegisterSchema = z.object({ email, password: newPassword })
 export const EmailSchema = z.object({ email })
 
 export const ResetPasswordSchema = z.object({
-  token: z.string().min(20, "This link is not valid"),
+  token: z.string().min(20, "El enlace no es válido"),
   password: newPassword,
 })
 
 export const TokenSchema = z.object({
-  token: z.string().min(20, "This link is not valid"),
+  token: z.string().min(20, "El enlace no es válido"),
 })

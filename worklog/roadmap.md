@@ -14,6 +14,7 @@ Actualizado: 2026-11-10
 | 3 | Auth: registro, login, confirmar email, recuperar contraseña | ✅ | [auth](2026-11-10-auth.md) |
 | 4a | Plantas en la base (sin `localStorage`) | ✅ | [plantas](2026-11-10-plantas-en-la-base.md) |
 | 4b | Script de importación del backup | ✅ (falta correrlo en producción) | [import y tests](2026-11-10-import-backup-y-tests.md) |
+| — | UI en español | ✅ | [ui en español](2026-11-10-ui-en-espanol.md) |
 | 5 | PWA: manifest y service worker | pendiente | — |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |

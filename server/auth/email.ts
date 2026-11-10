@@ -37,27 +37,27 @@ function escapeHtml(value: string): string {
 const COPY: Record<AuthEmailKind, { path: string; subject: string; heading: string; body: string; cta: string; expiry: string }> = {
   verify_email: {
     path: "/verify-email",
-    subject: "Confirm your email for Planti",
-    heading: "Welcome to Planti 🌱",
-    body: "Confirm your email to start taking care of your plants.",
-    cta: "Confirm my email",
-    expiry: "This link expires in 24 hours.",
+    subject: "Confirmá tu email en Planti",
+    heading: "Te damos la bienvenida a Planti 🌱",
+    body: "Confirmá tu email para empezar a cuidar tus plantas.",
+    cta: "Confirmar mi email",
+    expiry: "El enlace vence en 24 horas.",
   },
   reset_password: {
     path: "/reset-password",
-    subject: "Reset your Planti password",
-    heading: "Reset your password",
-    body: "Someone asked to reset the password of your Planti account. If it was you, choose a new one:",
-    cta: "Choose a new password",
-    expiry: "This link expires in 30 minutes. If you didn't ask for it, you can ignore this email.",
+    subject: "Recuperá tu contraseña de Planti",
+    heading: "Recuperá tu contraseña",
+    body: "Alguien pidió cambiar la contraseña de tu cuenta de Planti. Si fuiste vos, elegí una nueva:",
+    cta: "Elegir una contraseña nueva",
+    expiry: "El enlace vence en 30 minutos. Si no lo pediste, ignorá este email.",
   },
   already_registered: {
     path: "/reset-password",
-    subject: "You already have a Planti account",
-    heading: "You already have an account",
-    body: "Someone tried to sign up to Planti with this email, but it already has an account. If it was you and you don't remember your password, you can choose a new one:",
-    cta: "Choose a new password",
-    expiry: "This link expires in 30 minutes. If it wasn't you, you can ignore this email.",
+    subject: "Ya tenés una cuenta en Planti",
+    heading: "Ya tenés una cuenta",
+    body: "Alguien intentó registrarse en Planti con este email, pero ya tiene una cuenta. Si fuiste vos y no te acordás la contraseña, podés elegir una nueva:",
+    cta: "Elegir una contraseña nueva",
+    expiry: "El enlace vence en 30 minutos. Si no fuiste vos, ignorá este email.",
   },
 }
 
@@ -65,7 +65,7 @@ export function buildAuthEmail(kind: AuthEmailKind, token: string) {
   const copy = COPY[kind]
   const url = `${appUrl()}${copy.path}?token=${encodeURIComponent(token)}`
   const html = `<!doctype html>
-<html><body style="margin:0;padding:24px;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#111">
+<html lang="es"><body style="margin:0;padding:24px;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#111">
   <div style="max-width:480px;margin:0 auto;background:#fff;border:4px solid #000;padding:24px;box-shadow:6px 6px 0 #000">
     <h1 style="margin:0 0 16px;font-size:24px">${escapeHtml(copy.heading)}</h1>
     <p style="margin:0 0 24px;font-size:16px;line-height:1.5">${escapeHtml(copy.body)}</p>

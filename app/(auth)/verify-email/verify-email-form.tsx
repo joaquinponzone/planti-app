@@ -15,22 +15,22 @@ export function VerifyEmailForm({ token, email }: { token?: string; email?: stri
 
   if (token) {
     return (
-      <AuthCard title="Confirm your email" subtitle="One click and you're in.">
+      <AuthCard title="Confirmá tu email" subtitle="Un clic y entrás.">
         <form action={verifyAction} className="space-y-6">
           <input type="hidden" name="token" value={token} />
           <FormMessage error={verifyState.error} />
           <SubmitButton>
             <MailCheck className="mr-2 h-6 w-6" />
-            Confirm my email
+            Confirmar mi email
           </SubmitButton>
         </form>
         {verifyState.error && (
           <p className="mt-6 text-sm">
-            You can{" "}
+            Podés{" "}
             <Link href="/login" className="font-bold underline underline-offset-4">
-              log in
+              entrar
             </Link>{" "}
-            to get a new link.
+            para pedir un enlace nuevo.
           </p>
         )}
       </AuthCard>
@@ -39,28 +39,28 @@ export function VerifyEmailForm({ token, email }: { token?: string; email?: stri
 
   return (
     <AuthCard
-      title="Check your inbox"
+      title="Revisá tu email"
       subtitle={
         // Vale en los tres casos del registro (cuenta nueva, sin confirmar o ya
         // existente): en todos sale un email, aunque no siempre el mismo.
         email
-          ? `We've sent an email to ${maskEmail(email)}. Follow the link inside to continue.`
-          : "We've sent you an email. Follow the link inside to continue."
+          ? `Te mandamos un email a ${maskEmail(email)}. Seguí el enlace para continuar.`
+          : "Te mandamos un email. Seguí el enlace para continuar."
       }
     >
-      <p className="mb-6">The link expires in 24 hours. Remember to check the spam folder.</p>
+      <p className="mb-6">El enlace vence en 24 horas. Fijate también en la carpeta de spam.</p>
       {email && (
         <form action={resendAction} className="space-y-3">
           <input type="hidden" name="email" value={email} />
           <FormMessage message={resendState.message} error={resendState.error} />
           <button type="submit" className="font-bold underline underline-offset-4">
-            Didn&apos;t get it? Send it again
+            ¿No te llegó? Mandalo de nuevo
           </button>
         </form>
       )}
       <p className="mt-6 text-sm">
         <Link href="/login" className="underline underline-offset-4">
-          Back to log in
+          Volver a entrar
         </Link>
       </p>
     </AuthCard>

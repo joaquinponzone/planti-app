@@ -27,12 +27,12 @@ export type FormState = {
   unverifiedEmail?: string
 }
 
-const INVALID_CREDENTIALS = "Invalid email or password"
-const INVALID_LINK = "This link expired, was already used, or was replaced by a newer one."
-const GENERIC_EMAIL_SENT = "If there's an account for that email, we've sent you a link. Check your inbox."
+const INVALID_CREDENTIALS = "Email o contraseña incorrectos"
+const INVALID_LINK = "El enlace venció, ya se usó o lo reemplazó uno más nuevo."
+const GENERIC_EMAIL_SENT = "Si hay una cuenta con ese email, te mandamos un enlace. Revisá tu bandeja de entrada."
 
 function firstIssue(error: { issues: { message: string }[] }): FormState {
-  return { error: error.issues[0]?.message ?? "Check the form and try again" }
+  return { error: error.issues[0]?.message ?? "Revisá el formulario y probá de nuevo" }
 }
 
 /** Vercel pone la IP real del cliente primera en `x-forwarded-for`. */
@@ -53,7 +53,7 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
 
   const ip = await clientIp()
   if (!(await isLoginAllowed(email, ip))) {
-    return { error: "Too many attempts. Wait 15 minutes, or reset your password." }
+    return { error: "Demasiados intentos. Esperá 15 minutos o recuperá tu contraseña." }
   }
 
   const user = await findUserByEmail(email)
@@ -66,7 +66,7 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
   // Recién después de validar la contraseña: chequear antes el estado
   // permitiría averiguar qué emails tienen cuenta sin saber ninguna.
   if (!user!.emailVerifiedAt) {
-    return { error: "Confirm your email before logging in.", unverifiedEmail: email }
+    return { error: "Confirmá tu email antes de entrar.", unverifiedEmail: email }
   }
 
   await clearFailedLogins(email)

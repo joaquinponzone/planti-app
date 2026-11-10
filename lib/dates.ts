@@ -4,11 +4,12 @@
  * en el navegador, y si cada lado usara su propia zona el texto no coincidiría.
  */
 
+const LOCALE = "es-AR"
 const DAY_MS = 24 * 60 * 60 * 1000
 
 /** Fecha calendario (YYYY-MM-DD) de un instante en una zona horaria. */
 function calendarDay(date: Date, timeZone: string): string {
-  // en-CA formatea como YYYY-MM-DD
+  // en-CA formatea como YYYY-MM-DD; es un formato técnico, no se muestra.
   return date.toLocaleDateString("en-CA", { timeZone })
 }
 
@@ -22,15 +23,16 @@ export function daysAgo(date: Date, now: Date, timeZone: string): number {
   return Math.round((b - a) / DAY_MS)
 }
 
-const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" })
+const rtf = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto" })
 
-/** "today", "yesterday", "3 days ago". */
+/** "hoy", "ayer", "anteayer", "hace 3 días". */
 export function formatDaysAgo(days: number): string {
   return rtf.format(-days, "day")
 }
 
+/** "23 de feb de 2026, 12:28 p. m." */
 export function formatDateTime(date: Date, timeZone: string): string {
-  return date.toLocaleString("en-US", {
+  return date.toLocaleString(LOCALE, {
     timeZone,
     year: "numeric",
     month: "short",

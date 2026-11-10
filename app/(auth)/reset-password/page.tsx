@@ -9,9 +9,9 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
 
   if (!token) {
     return (
-      <AuthCard title="Invalid link" subtitle="This link is incomplete.">
+      <AuthCard title="Enlace inválido" subtitle="Este enlace está incompleto.">
         <Link href="/forgot-password" className="font-bold underline underline-offset-4">
-          Ask for a new one
+          Pedí uno nuevo
         </Link>
       </AuthCard>
     )

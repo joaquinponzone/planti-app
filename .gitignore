@@ -39,3 +39,6 @@ next-env.d.ts
 .env
 # base local de desarrollo
 /local.db*
+
+# backups de usuarios (datos personales); el de los tests vive en tests/fixtures/
+/planti-backup-*.json

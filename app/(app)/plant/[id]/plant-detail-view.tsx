@@ -26,20 +26,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type { CareActivityType } from "@/lib/care"
+import { CARE_ACTIVITY_LABELS, CARE_ACTIVITY_TYPES, type CareActivityType } from "@/lib/care"
 
 import { addCareActivity, removeCareActivity } from "../../actions"
 
-const CARE_ACTIVITIES: { type: CareActivityType; icon: React.ReactNode; label: string }[] = [
-  { type: "watered", icon: <Droplet className="h-5 w-5" />, label: "Watered" },
-  { type: "medicated", icon: <Pill className="h-5 w-5" />, label: "Medicated" },
-  { type: "fertilized", icon: <FlowerIcon className="h-5 w-5" />, label: "Fertilized" },
-  { type: "misted", icon: <Spray className="h-5 w-5" />, label: "Misted" },
-  { type: "wiped", icon: <Leaf className="h-5 w-5" />, label: "Wiped leaves" },
-  { type: "moved", icon: <MoveRight className="h-5 w-5" />, label: "Moved" },
-  { type: "repotted", icon: <Flower2 className="h-5 w-5" />, label: "Repotted" },
-  { type: "pruned", icon: <Scissors className="h-5 w-5" />, label: "Pruned" },
-]
+// Los íconos son presentación de esta pantalla; las etiquetas salen del
+// diccionario (`CARE_ACTIVITY_LABELS`), que es el único lugar donde se traducen.
+const ICONS: Record<CareActivityType, React.ReactNode> = {
+  watered: <Droplet className="h-5 w-5" />,
+  medicated: <Pill className="h-5 w-5" />,
+  fertilized: <FlowerIcon className="h-5 w-5" />,
+  misted: <Spray className="h-5 w-5" />,
+  wiped: <Leaf className="h-5 w-5" />,
+  moved: <MoveRight className="h-5 w-5" />,
+  repotted: <Flower2 className="h-5 w-5" />,
+  pruned: <Scissors className="h-5 w-5" />,
+}
+
+const CARE_ACTIVITIES = CARE_ACTIVITY_TYPES.map((type) => ({ type, icon: ICONS[type], label: CARE_ACTIVITY_LABELS[type] }))
 
 const activityButtonClass =
   "w-full text-black h-12 md:h-10 border-2 border-black justify-start hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
@@ -89,7 +93,7 @@ export function PlantDetailView({
           className="inline-flex items-center mb-6 text-lg font-medium text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to plants
+          Volver a las plantas
         </Link>
 
         <div className="border-4 border-black bg-card dark:bg-card/10 mb-6 neo-brutalist-shadow">
@@ -109,7 +113,7 @@ export function PlantDetailView({
                   variant="outline"
                   className="border-2 border-black hover:bg-primary/30 bg-neutral-100 dark:neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all text-black"
                 >
-                  Edit plant
+                  Editar planta
                 </Button>
               </Link>
             </div>
@@ -136,10 +140,10 @@ export function PlantDetailView({
         </div>
 
         <div className="border-4 border-black bg-card/20 neo-brutalist-shadow">
-          <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-secondary dark:text-neutral-900">Activity log</h2>
+          <h2 className="p-4 text-xl font-bold border-b-2 border-black bg-secondary dark:text-neutral-900">Historial de cuidados</h2>
 
           {activities.length === 0 ? (
-            <div className="p-6 text-center text-muted-foreground"> - No activities recorded yet - </div>
+            <div className="p-6 text-center text-muted-foreground"> - Todavía no hay cuidados registrados - </div>
           ) : (
             <div className="divide-y-2 divide-black">
               {activities.map((activity) => {
@@ -155,7 +159,7 @@ export function PlantDetailView({
                     </div>
                     {activity.notes && (
                       <div className="ml-3">
-                        <p className="text-sm font-semibold">Notes:</p>
+                        <p className="text-sm font-semibold">Notas:</p>
                         <p className="text-sm text-muted-foreground">{activity.notes}</p>
                       </div>
                     )}
@@ -166,7 +170,7 @@ export function PlantDetailView({
                       className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity hover:bg-destructive hover:text-destructive-foreground"
                     >
                       <X className="h-4 w-4" />
-                      <span className="sr-only">Remove activity</span>
+                      <span className="sr-only">Borrar del historial</span>
                     </Button>
                   </div>
                 )
@@ -179,9 +183,9 @@ export function PlantDetailView({
       <Dialog open={!!activityToDelete} onOpenChange={(open) => !open && setActivityToDelete(null)}>
         <DialogContent className="border-4 border-black dark:border-white bg-card neo-brutalist-shadow sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Delete activity</DialogTitle>
+            <DialogTitle className="text-xl font-bold">Borrar del historial</DialogTitle>
             <DialogDescription className="text-base text-muted-foreground">
-              Are you sure you want to remove this activity? This action cannot be undone.
+              ¿Seguro que querés borrar este cuidado? No se puede deshacer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:gap-0">
@@ -190,14 +194,14 @@ export function PlantDetailView({
               onClick={() => setActivityToDelete(null)}
               className="flex-1 sm:flex-none border-2 border-black hover:bg-neutral-300 bg-neutral-100 dark:bg-neutral-900 hover:text-primary-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               onClick={confirmDelete}
               disabled={deleting}
               className="flex-1 sm:flex-none border-2 border-black bg-destructive text-destructive-foreground hover:bg-destructive/90 neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
             >
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Borrar"}
             </Button>
           </DialogFooter>
         </DialogContent>

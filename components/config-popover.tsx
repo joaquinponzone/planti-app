@@ -19,7 +19,7 @@ function SaveButton() {
       disabled={pending}
       className="bg-primary text-primary-foreground hover:bg-primary/90 border-2 border-black"
     >
-      {pending ? "Saving..." : "Save"}
+      {pending ? "Guardando…" : "Guardar"}
     </Button>
   )
 }
@@ -43,7 +43,7 @@ export function ConfigPopover({ warningDays, dangerDays }: { warningDays: number
           className="border-2 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
         >
           <Settings className="h-5 w-5" />
-          <span className="sr-only">Configure Thresholds</span>
+          <span className="sr-only">Configurar alertas</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60 border-2 border-black bg-background neo-brutalist-shadow">
@@ -54,8 +54,8 @@ export function ConfigPopover({ warningDays, dangerDays }: { warningDays: number
         */}
         <form action={formAction} className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium leading-none">Alert Thresholds</h4>
-            <p className="text-sm text-muted-foreground">Set days since last watered for alerts.</p>
+            <h4 className="font-medium leading-none">Alertas de riego</h4>
+            <p className="text-sm text-muted-foreground">Días sin regar hasta que la tarjeta cambia de color.</p>
           </div>
           {state.error && (
             <p role="alert" className="text-sm font-medium text-destructive">
@@ -64,7 +64,7 @@ export function ConfigPopover({ warningDays, dangerDays }: { warningDays: number
           )}
           <div className="grid gap-2">
             <div className="grid grid-cols-3 items-center gap-4">
-              <Label htmlFor="warningDays">Warning</Label>
+              <Label htmlFor="warningDays">Aviso</Label>
               <Input
                 id="warningDays"
                 name="warningDays"
@@ -77,7 +77,7 @@ export function ConfigPopover({ warningDays, dangerDays }: { warningDays: number
               />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
-              <Label htmlFor="dangerDays">Danger</Label>
+              <Label htmlFor="dangerDays">Peligro</Label>
               <Input
                 id="dangerDays"
                 name="dangerDays"
@@ -92,7 +92,7 @@ export function ConfigPopover({ warningDays, dangerDays }: { warningDays: number
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} className="border-2 border-black">
-              Cancel
+              Cancelar
             </Button>
             <SaveButton />
           </div>

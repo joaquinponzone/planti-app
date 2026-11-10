@@ -112,11 +112,12 @@ test("borrar una planta borra en cascada sus cuidados y rutinas", async () => {
 test("daysAgo cuenta días calendario en la zona del usuario", () => {
   const tz = "America/Argentina/Buenos_Aires" // UTC-3
   const now = new Date("2026-11-10T11:00:00Z") // 08:00 local
-  expect(daysAgo(new Date("2026-11-10T02:00:00Z"), now, tz)).toBe(1) // 23:00 de ayer: "yesterday" aunque pasaron 9 h
+  expect(daysAgo(new Date("2026-11-10T02:00:00Z"), now, tz)).toBe(1) // 23:00 de ayer: "ayer" aunque pasaron 9 h
   expect(daysAgo(new Date("2026-11-10T03:30:00Z"), now, tz)).toBe(0) // 00:30 de hoy
   expect(daysAgo(new Date("2026-11-03T20:00:00Z"), now, tz)).toBe(7)
-  expect(formatDaysAgo(0)).toBe("today")
-  expect(formatDaysAgo(1)).toBe("yesterday")
+  expect(formatDaysAgo(0)).toBe("hoy")
+  expect(formatDaysAgo(1)).toBe("ayer")
+  expect(formatDaysAgo(3)).toBe("hace 3 días")
 })
 
 test("validación: textos vacíos pasan a null y los umbrales tienen que tener sentido", () => {

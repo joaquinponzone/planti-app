@@ -12,18 +12,18 @@ export default function ForgotPasswordPage() {
   const [state, action] = useActionState<FormState, FormData>(forgotPassword, {})
 
   return (
-    <AuthCard title="Forgot your password?" subtitle="We'll email you a link to choose a new one.">
+    <AuthCard title="¿Te olvidaste la contraseña?" subtitle="Te mandamos un enlace por email para elegir una nueva.">
       <form action={action} className="space-y-6">
         <FormMessage error={state.error} message={state.message} />
         <Field label="Email" name="email" type="email" autoComplete="email" required />
         <SubmitButton>
           <Send className="mr-2 h-6 w-6" />
-          Send me a link
+          Mandame el enlace
         </SubmitButton>
       </form>
       <p className="mt-6 text-sm">
         <Link href="/login" className="underline underline-offset-4">
-          Back to log in
+          Volver a entrar
         </Link>
       </p>
     </AuthCard>

@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="w-full py-4 pt-12 text-center text-sm text-gray-600 dark:text-gray-400">
       <p>
-      © {currentYear} • Made with ♥️ by{" "}
+      © {currentYear} • Hecho con ♥️ por{" "}
         <a
           href="https://github.com/joaquinponzone"
           target="_blank"

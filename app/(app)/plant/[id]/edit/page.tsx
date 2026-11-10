@@ -23,12 +23,12 @@ export default async function EditPlant({ params }: { params: Promise<{ id: stri
           className="inline-flex items-center mb-6 text-lg font-medium text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Volver
         </Link>
 
         <div className="border-4 border-black bg-neutral-100 dark:bg-neutral-800 mb-6 neo-brutalist-shadow">
           <div className="p-6">
-            <h1 className="text-3xl font-bold mb-6 dark:text-neutral-200 border-b-4 border-black pb-2">Edit plant</h1>
+            <h1 className="text-3xl font-bold mb-6 dark:text-neutral-200 border-b-4 border-black pb-2">Editar planta</h1>
             <PlantForm
               action={updatePlant.bind(null, plant.id)}
               initial={{ name: plant.name, scientificName: plant.scientificName, location: plant.location, notes: plant.notes }}

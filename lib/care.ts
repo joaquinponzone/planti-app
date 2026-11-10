@@ -48,5 +48,25 @@ export const SCHEDULE_FOR_ACTIVITY: Record<CareActivityType, ScheduleType> = {
   pruned: "pruning",
 }
 
+/**
+ * Etiquetas en pantalla. El dominio habla inglés (lo que se guarda) y la
+ * pantalla habla español: la traducción pasa sólo por acá. Si un valor en
+ * inglés llega a la pantalla, es un bug.
+ *
+ * Son sustantivos ("Riego", no "Regada") porque sirven igual en el botón
+ * para registrarlo y en el historial. `Record<…>` hace que agregar un tipo
+ * sin etiqueta no compile.
+ */
+export const CARE_ACTIVITY_LABELS: Record<CareActivityType, string> = {
+  watered: "Riego",
+  medicated: "Tratamiento",
+  fertilized: "Fertilización",
+  misted: "Pulverización",
+  wiped: "Limpieza de hojas",
+  moved: "Cambio de lugar",
+  repotted: "Trasplante",
+  pruned: "Poda",
+}
+
 export const DEFAULT_WARNING_DAYS = 14
 export const DEFAULT_DANGER_DAYS = 30

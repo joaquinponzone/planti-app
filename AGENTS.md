@@ -8,6 +8,25 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## El dominio habla inglés, la pantalla habla español
+
+La UI está en español rioplatense, con voseo ("Confirmá", "Entrá"). Un solo idioma, sin
+framework de i18n (ver D-009 en `worklog/decisiones.md`).
+
+- **Todo valor que se guarda va en inglés**: columnas, enums, claves (`watered`,
+  `fertilization`). Si una palabra española llega al esquema, es un bug.
+- **La traducción de los valores del dominio pasa una sola vez**, por el mapa que está al
+  lado de su enum: `CARE_ACTIVITY_LABELS` en `lib/care.ts`. Es `Record<Tipo, string>`, así
+  que agregar un tipo sin etiqueta no compila. Si estás por escribir un mapa de etiquetas
+  dentro de un componente, ya existe o tiene que nacer en `lib/care.ts`.
+- **La prosa no va al diccionario**: botones, títulos y mensajes se escriben en español
+  directamente en el componente.
+- **Los schemas importan `z` desde `@/lib/zod`, nunca desde "zod".** Ahí se configuran los
+  mensajes por defecto en español; zod declara `sideEffects: false` y un `z.config` suelto
+  puede no aplicarse.
+- Fechas con `lib/dates.ts` (`es-AR`, zona horaria del usuario). Lenguaje neutro cuando
+  hay género: "Te damos la bienvenida", no "Bienvenida/o".
+
 ## Verificar antes de dar algo por terminado
 
 `bun run lint`, `bunx tsc --noEmit -p .` y `bun run test`. Los tests usan una base SQLite

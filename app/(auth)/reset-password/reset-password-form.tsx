@@ -13,28 +13,28 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const [state, action] = useActionState<FormState, FormData>(resetPassword, {})
 
   return (
-    <AuthCard title="Choose a new password" subtitle="You'll be logged out of all your devices.">
+    <AuthCard title="Elegí una contraseña nueva" subtitle="Se va a cerrar la sesión en todos tus dispositivos.">
       <form action={action} className="space-y-6">
         <input type="hidden" name="token" value={token} />
         <FormMessage error={state.error} />
         <Field
-          label="New password"
+          label="Contraseña nueva"
           name="password"
           type="password"
           autoComplete="new-password"
           minLength={PASSWORD_MIN_LENGTH}
-          hint={`At least ${PASSWORD_MIN_LENGTH} characters.`}
+          hint={`Al menos ${PASSWORD_MIN_LENGTH} caracteres.`}
           required
         />
         <SubmitButton>
           <KeyRound className="mr-2 h-6 w-6" />
-          Save new password
+          Guardar contraseña
         </SubmitButton>
       </form>
       {state.error && (
         <p className="mt-6 text-sm">
           <Link href="/forgot-password" className="font-bold underline underline-offset-4">
-            Ask for a new link
+            Pedí un enlace nuevo
           </Link>
         </p>
       )}

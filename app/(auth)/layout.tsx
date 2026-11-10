@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main className="container mx-auto p-4 md:p-8">
         <div className="max-w-md mx-auto">
           <p className="text-4xl font-black tracking-tight mb-1">Planti</p>
-          <p className="text-lg font-medium text-muted-foreground mb-8">Keep your green friends alive!</p>
+          <p className="text-lg font-medium text-muted-foreground mb-8">¡Mantené vivas a tus plantas!</p>
           {children}
         </div>
       </main>

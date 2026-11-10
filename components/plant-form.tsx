@@ -32,7 +32,7 @@ function SubmitButton({ mode }: { mode: "create" | "edit" }) {
       className="h-14 flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xl font-bold border-4 border-black neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
     >
       <Icon className={`mr-2 h-6 w-6 ${pending ? "animate-spin" : ""}`} />
-      {mode === "create" ? "Create Plant" : "Save changes"}
+      {mode === "create" ? "Crear planta" : "Guardar cambios"}
     </Button>
   )
 }
@@ -55,7 +55,7 @@ export function PlantForm({
 
       <div className="space-y-2">
         <Label htmlFor="name" className="text-lg">
-          Name
+          Nombre
         </Label>
         <Input
           id="name"
@@ -64,16 +64,16 @@ export function PlantForm({
           required
           maxLength={100}
           className={inputClass}
-          placeholder="Kitchen window plant"
+          placeholder="La de la ventana de la cocina"
         />
         <p className="text-sm text-muted-foreground">
-          If you don&apos;t know the name of the plant just type something that will help you identify it.
+          Si no sabés cómo se llama, poné algo que te ayude a reconocerla.
         </p>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="scientificName" className="text-lg">
-          Scientific name
+          Nombre científico
         </Label>
         <Input
           id="scientificName"
@@ -81,13 +81,13 @@ export function PlantForm({
           defaultValue={initial?.scientificName ?? ""}
           maxLength={100}
           className={inputClass}
-          placeholder="Scientific name"
+          placeholder="Monstera deliciosa"
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="location" className="text-lg">
-          Location / Room
+          Ubicación / ambiente
         </Label>
         <Input
           id="location"
@@ -95,14 +95,14 @@ export function PlantForm({
           defaultValue={initial?.location ?? ""}
           maxLength={100}
           className={inputClass}
-          placeholder="No location"
+          placeholder="Living"
         />
-        <p className="text-sm text-muted-foreground">To group plants by location</p>
+        <p className="text-sm text-muted-foreground">Para agrupar las plantas por lugar</p>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="notes" className="text-lg">
-          Notes
+          Notas
         </Label>
         <Textarea
           id="notes"
@@ -122,7 +122,7 @@ export function PlantForm({
             className="h-14 text-lg flex-1 border-2 border-black hover:bg-destructive/30 bg-neutral-100 dark:bg-neutral-900 hover:text-destructive-foreground neo-brutalist-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all"
             onClick={() => router.back()}
           >
-            Cancel
+            Cancelar
           </Button>
         )}
       </div>
