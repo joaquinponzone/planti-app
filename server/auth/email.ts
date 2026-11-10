@@ -14,8 +14,17 @@ export type AuthEmailKind =
    */
   | "already_registered"
 
+/**
+ * La base de los links de los emails. En un deploy de preview tiene que ser
+ * la URL del branch: el token vive en la base de preview, y un link al
+ * dominio de producción llevaría a una base donde ese token no existe.
+ * `VERCEL_BRANCH_URL` es estable para el branch (no cambia en cada push).
+ */
 export function appUrl(): string {
   if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, "")
+  if (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_BRANCH_URL) {
+    return `https://${process.env.VERCEL_BRANCH_URL}`
+  }
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   return "http://localhost:3000"
 }

@@ -8,6 +8,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Verificar antes de dar algo por terminado
+
+`bun run lint`, `bunx tsc --noEmit -p .` y `bun run test`. Los tests usan una base SQLite
+temporal (`tests/setup.ts`), nunca la de `.env`, y no mandan emails.
+
 ## Worklog: leer antes de empezar, actualizar al terminar
 
 `worklog/` guarda lo que el código no dice. Ver [`worklog/README.md`](worklog/README.md).

@@ -1,0 +1,25 @@
+{
+  "plantStatusThresholds": {
+    "warningDays": 14,
+    "dangerDays": 30
+  },
+  "plants": [
+    {
+      "id": "1",
+      "name": "Pandu",
+      "scientificName": "",
+      "location": "Living Room",
+      "notes": "",
+      "imageUrls": [],
+      "schedules": [],
+      "careLog": [
+        {
+          "type": "watered",
+          "id": "1771860528947",
+          "date": "2026-02-23T15:28:48.947Z"
+        }
+      ],
+      "archived": false
+    }
+  ]
+}

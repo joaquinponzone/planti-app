@@ -13,24 +13,34 @@ Actualizado: 2026-11-10
 | 2 | Next 16 + React 19 | ✅ | [next 16](2026-11-10-next-16.md) |
 | 3 | Auth: registro, login, confirmar email, recuperar contraseña | ✅ | [auth](2026-11-10-auth.md) |
 | 4a | Plantas en la base (sin `localStorage`) | ✅ | [plantas](2026-11-10-plantas-en-la-base.md) |
-| 4b | Script de importación del backup | ⏳ espera el JSON | — |
+| 4b | Script de importación del backup | ✅ (falta correrlo en producción) | [import y tests](2026-11-10-import-backup-y-tests.md) |
 | 5 | PWA: manifest y service worker | pendiente | — |
 | 6 | Push: VAPID, `web-push`, cron diario, pantalla de rutinas | pendiente | — |
 | 7 | Fotos con Vercel Blob | pendiente | — |
 
-## Próximo: 4b, importar el backup
+## Próximo: salir a producción
 
-1. La usuaria hace **Export** desde la versión de Planti que está hoy en producción.
-2. Se deploya la versión nueva y ella se registra.
-3. `bun scripts/import-backup.ts <backup.json> <email> [--dry-run]` contra Turso.
+Antes de mergear a `main`:
 
-Transformaciones: rutinas duplicadas del mismo tipo → una sola (la del cuidado más
-reciente); `lastWatered` sin riego en el historial → un riego con esa fecha; las fotos se
-descartan (eran `URL.createObjectURL`, que no sobrevive a recargar); los umbrales se copian
-a `users`.
+1. **Vercel, scope Production:** `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `AUTH_SECRET`,
+   `RESEND_API_KEY`, `RESEND_FROM_DOMAIN` y, opcional, `APP_URL` (solo acá).
+2. **Vercel, scope Preview:** una base aparte (`planti-preview` en Turso), un `AUTH_SECRET`
+   **distinto** del de producción (si no, una cookie del preview sirve en producción) y
+   Resend. Sin `TURSO_DATABASE_URL` en Preview, el build de cualquier branch falla.
+3. **Vercel, scope Development:** vacío. `vercel env pull` lo bajaría a tu `.env`.
+4. **Resend:** dominio verificado. Sin eso solo te llegan los emails a vos y nadie más puede
+   confirmar su cuenta. Salida de emergencia: `update users set email_verified_at = …`.
+5. **Pasada por el navegador** con `bun dev`: regar, cuidados rápidos, diálogo con notas,
+   borrar, umbrales, logout. Nada de eso se probó con clics.
+6. Confirmar que las funciones de Vercel corren en `iad1`, la misma zona que Turso
+   (`aws-us-east-1`).
 
-**No deployar a producción antes de tener el backup.** Al deployar, la app pasa a pedir
-login y deja de leer `localStorage`.
+Después de mergear:
+
+1. La usuaria hace **Export** en la versión vieja *antes* del deploy (si no, ya no tiene el
+   botón) y se registra en la nueva.
+2. `bun scripts/import-backup.ts <backup.json> <email> --dry-run` contra Turso, y después
+   sin `--dry-run`.
 
 ## Después
 
@@ -42,7 +52,9 @@ login y deja de leer `localStorage`.
   recordar. La tabla `push_subscriptions` ya existe, atada a `sessionVersion` como en
   futclub. En iOS, las push solo llegan con la PWA instalada (iOS 16.4 o superior).
 - **7 · Fotos.** Vercel Blob; la tabla `plant_photos` ya existe. La pestaña Photos se sacó
-  en el 4a hasta tener la subida real.
+  en el 4a hasta tener la subida real. Ojo: `BLOB_READ_WRITE_TOKEN` (de 2025) está cargado
+  en **todos** los entornos de Vercel. Antes de usarlo, separar Preview (otro store o
+  ninguno); si no, lo que se sube probando un preview cae en el store de producción.
 
 ## Preguntas abiertas
 
@@ -59,5 +71,8 @@ login y deja de leer `localStorage`.
 
 - `package.json` dice `"packageManager": "yarn@1.22.22"`, pero el proyecto usa bun. Hoy no
   rompe nada (Vercel elige por el lockfile), pero contradice al resto.
-- No hay suite de tests en el repo. Las pruebas de los pasos 3 y 4a se corrieron con
-  `bun test --conditions=react-server` contra bases temporales, desde fuera del repo.
+- README desactualizado: dice Next 14 y "local storage", y no menciona Turso, las
+  migraciones, `bun run test` ni las variables nuevas.
+- Sin CI. Un GitHub Action con lint, typecheck y `bun run test` en cada push.
+- La zona horaria es fija (Buenos Aires) y no hay forma de cambiarla.
+- Sin `error.tsx`: si Turso no responde, se ve la página de error genérica de Next.
